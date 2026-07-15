@@ -3,6 +3,8 @@
 
 *Frozen on 2026-07-08. Every claim below was verified against primary sources (arXiv abstract pages, GitHub repos, Hugging Face model cards) in this session. This is the document to keep open while you work. Nothing in it is optional unless marked OPTIONAL.*
 
+> **Amendment A1 (2026-07-14) applies.** Phase-2 data sources are revised — see [Amendment A1](#amendment-a1-2026-07-14--phase-2-data-sources-revised) at the end of this document. The eval ruler (benchmark, protocol, targets) is unchanged.
+
 ---
 
 ## 0. The project in one paragraph
@@ -256,3 +258,42 @@ Each phase runs the loop: **Learn (I teach from zero) → Build (we implement, e
 | Timeline slips | weekly review vs phase map | cut OPTIONAL items first (Gemma, CISPO, ordering run) — never cut seeds or controls |
 
 *End of master workflow. Next physical action: Phase 0 checklist items, then Milestone 0 tonight.*
+
+---
+
+## Amendment A1 (2026-07-14) — Phase-2 data sources revised
+
+*The plan doc is frozen; changes arrive as dated amendments, never silent edits. This amendment changes TRAINING DATA only. The ruler — HumanEvalFix, harness, decode settings, targets — is untouched.*
+
+### A1.1 CUT: `google/code_x_glue_cc_code_refinement`
+
+Verified against the dataset card (2026-07-14): the dataset is **Java-only** with **abstracted identifiers** (`VAR_1`, `METHOD_1`, `TYPE_1`). There is no Python to filter to, and abstracted Java is useless for natural Python repair. Removed from Phase 2, step 1.
+
+### A1.2 NEW BACKBONE: mutation-injected bugs over verified-correct functions
+
+The training distribution must match the benchmark's shape: *single self-contained Python function + tests + one small semantic bug*. Build it directly instead of mining for it:
+
+1. **Correct functions with tests:**
+   - **MBPP+** (EvalPlus-augmented sanitized MBPP, ~400 problems, tests ~35× stronger than original MBPP) — primary seed corpus.
+   - **CommitPackFT Python** filtered to single-function diffs — teacher generates tests, every test through the gold-sanity gate (unchanged from step 2). Keeps *real human bugs* in the mix alongside synthetic ones.
+   - OPTIONAL: teacher-authored function+test sets, gold-gated, if volume falls short.
+2. **Bug injection**, mapped 1:1 onto the OctoPack taxonomy:
+   - AST mutation operators: operator swap → *operator misuse*; identifier swap (same-scope, type-compatible) → *variable misuse*; constant perturbation / off-by-one → *value misuse*; statement deletion → *missing logic*; statement insertion → *excess logic*; call substitution → *function misuse*.
+   - LLM-injected subtle bugs (teacher prompt: "introduce one realistic <category> bug") for naturalness — same validation as below.
+3. **Validation rule (the equivalent-mutant trap):** every mutant must **compile AND fail ≥1 test**. A mutant that passes all tests is either an equivalent mutant or a weak test suite — discard it, never train on it.
+4. **Diversity caps:** ≤2 mutants per source function (AceReason: prompt diversity beats responses-per-prompt). **Split at FUNCTION level** — all mutants of one function live in the same train/dev/held-out split, or near-duplicate leakage silently inflates dev scores.
+5. **Taxonomy-balanced sampling**, oversampling *excess-logic* (deletion-type — the benchmark's hardest category and the headroom).
+6. **Restraint suite = the unmutated originals** (verified-clean, tests attached) — the ~100-example suite from step E2 now falls out of the pipeline for free.
+7. **Contamination audit unchanged** and now also runs over all MBPP-derived data. Note for the paper's limitations: MBPP+ is itself a benchmark; training on it forfeits ever reporting MBPP numbers for these models.
+
+### A1.3 Reward-data consequence: visible/hidden test split
+
+Because Phase 2 now constructs the tests, construct them in two pools per problem: **K visible tests** (shown in the RL prompt, matching the benchmark's tests-in-prompt format) and **held-back hidden tests** (used by the reward alongside the visible ones). A policy that hardcodes the visible tests fails the hidden ones — this closes the one reward hack the sandbox and transcript reads cannot catch, because it isn't cheating, it's specification gaming.
+
+### A1.4 Teacher model: DeepSeek, not Gemini
+
+Gemini API terms restrict using outputs to train models; this project ships a public dataset + arXiv paper. DeepSeek's terms permit distillation. All teacher roles (SFT traces, test generation, LLM bug injection) use DeepSeek. Gemini may be used for private analysis only.
+
+### A1.5 Unchanged
+
+Benchmark, harness, prompt-format freeze, decode settings, targets, gold-sanity gate, matched budgets, all ground rules, all phase gates. Phase-2 GPU/API budget unchanged (~10 units + API); mutation injection is CPU-cheap and *reduces* teacher-API spend vs. generating tests for every commit-mined problem.
