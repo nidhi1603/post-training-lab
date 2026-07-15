@@ -1,0 +1,6 @@
+# Local / CPU tooling for the eval + reward layer (no GPU needed).
+# Training deps (torch, transformers, trl, unsloth, peft, vllm) are installed in the
+# Colab notebooks, pinned there, and NOT listed here on purpose -- this file is what
+# you need to run the tests and the eval scripts on a laptop.
+numpy>=1.24
+pytest>=7.4

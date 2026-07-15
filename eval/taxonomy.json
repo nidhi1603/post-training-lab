@@ -1,0 +1,36 @@
+{
+  "_source": "OctoPack (arXiv 2308.07124), Table 15 -- bug-type distribution of the HumanEvalFix Python split.",
+  "_note": "Counts sum to 164 (the full HumanEvalFix benchmark). These are category COUNTS, not per-problem labels. Populate `problem_bug_type` in Phase 1 from the dataset's own bug-type field, then eval/taxonomy_breakdown.py can produce a per-category pass@1 table for any generations file.",
+  "total_problems": 164,
+  "hardest_category_expected": "excess_logic",
+  "hardest_category_reason": "Excess-logic bugs require the model to DELETE code rather than add or change it; OctoPack reports these as the hardest to fix.",
+  "categories": {
+    "missing_logic": {
+      "count": 33,
+      "description": "Correct code is missing (a needed statement/branch/condition was omitted). Fix = add code."
+    },
+    "excess_logic": {
+      "count": 31,
+      "description": "Extra, incorrect code is present. Fix = delete code. Empirically the hardest category."
+    },
+    "value_misuse": {
+      "count": 44,
+      "description": "A wrong literal/constant/value is used. Fix = change a value."
+    },
+    "operator_misuse": {
+      "count": 25,
+      "description": "A wrong operator is used (e.g. < instead of <=, + instead of -). Fix = change an operator."
+    },
+    "variable_misuse": {
+      "count": 23,
+      "description": "A wrong variable/identifier is referenced. Fix = change a variable."
+    },
+    "function_misuse": {
+      "count": 8,
+      "description": "A wrong function/method is called. Fix = change a call."
+    }
+  },
+  "problem_bug_type": {
+    "_placeholder": "Map each HumanEvalFix task_id -> category key above. Fill in Phase 1 from the dataset."
+  }
+}

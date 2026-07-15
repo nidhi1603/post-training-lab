@@ -1,0 +1,30 @@
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+env/
+*.egg-info/
+
+# Data & model artifacts (kept in Drive / HF, not git; see data/README.md)
+data/raw/
+data/interim/
+*.jsonl
+*.parquet
+checkpoints/
+adapters/
+*.safetensors
+*.bin
+wandb/
+
+# Eval outputs (regenerated; commit only the curated tables)
+eval/generations/
+eval/results/*.json
+!eval/results/.gitkeep
+
+# OS / editor
+.DS_Store
+.ipynb_checkpoints/
+.vscode/
+.idea/
