@@ -50,9 +50,9 @@ Total ≈ 175 Colab compute units (you have ~300) + Modal/Lightning free tiers a
 - [x] Hugging Face account + write token
 - [x] Llama-3.2-3B-Instruct access requested (gated; approval usually minutes–hours)
 - [x] Colab Pro confirmed (~300 compute units; T4 ≈ 1.76 units/hr, L4 ≈ 5, A100 ≈ 15)
-- [ ] Google Drive folder `rl-post-training/` for checkpoints (Colab *will* disconnect; a run without checkpoint syncing is a run you will lose)
-- [ ] GitHub repo `post-training-lab` created, with `README.md` stub and this workflow committed
-- [ ] Modal account (free $30/month credits — will host the sandboxed reward execution later) and Lightning AI account (free monthly credits, backup GPU)
+- [x] Google Drive folder `rl-post-training/` for checkpoints (done 2026-07-14; Colab *will* disconnect; a run without checkpoint syncing is a run you will lose)
+- [x] GitHub repo `post-training-lab` created (done 2026-07-14: https://github.com/nidhi1603/post-training-lab — eval + reward layer implemented and tested, ahead of schedule)
+- [x] Modal account (free $30/month credits — will host the sandboxed reward execution later) and Lightning AI account (free monthly credits, backup GPU) (done 2026-07-14)
 - [ ] **Milestone 0:** run Unsloth's GRPO notebook unchanged on a Colab T4 (`nb/Qwen2.5_(3B)-GRPO.ipynb` from unslothai/notebooks). Success = the reward table prints and you can name what each column is. ~3 units, ~1.5 hours. You are proving the machinery, not training a model.
 
 **Learn block 0** (companion reading — llm-foundations site, your friend-circle's series): Modules 02–05 (tokenization, transformer, attention, positional encoding) if any feel shaky; Module 10 (decoding & sampling) *before* Phase 1, because pass@1 estimation is a sampling question.
