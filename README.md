@@ -68,7 +68,7 @@ Colab Pro ≈ 300 units. Plan ≈ 175. Update this table as you burn units.
 
 | Phase | Budgeted units | Spent | Notes |
 |---|---|---|---|
-| 0 Setup / Milestone 0 | ~3 | | Unsloth GRPO notebook unchanged |
+| 0 Setup / Milestone 0 | ~3 | ~3 (2026-07-15) | Unsloth GRPO notebook unchanged — 250 steps, T4, 1h40m |
 | 1 Baseline (Qwen + Llama) | ~15 | | L4; n=20 each |
 | 2 Data pipeline | ~10 + API | | teacher-model API separate |
 | 3 SFT ×3 seeds | ~15 | | |

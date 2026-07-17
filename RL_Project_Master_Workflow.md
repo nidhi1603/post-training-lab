@@ -53,7 +53,7 @@ Total ≈ 175 Colab compute units (you have ~300) + Modal/Lightning free tiers a
 - [x] Google Drive folder `rl-post-training/` for checkpoints (done 2026-07-14; Colab *will* disconnect; a run without checkpoint syncing is a run you will lose)
 - [x] GitHub repo `post-training-lab` created (done 2026-07-14: https://github.com/nidhi1603/post-training-lab — eval + reward layer implemented and tested, ahead of schedule)
 - [x] Modal account (free $30/month credits — will host the sandboxed reward execution later) and Lightning AI account (free monthly credits, backup GPU) (done 2026-07-14)
-- [ ] **Milestone 0:** run Unsloth's GRPO notebook unchanged on a Colab T4 (`nb/Qwen2.5_(3B)-GRPO.ipynb` from unslothai/notebooks). Success = the reward table prints and you can name what each column is. ~3 units, ~1.5 hours. You are proving the machinery, not training a model.
+- [x] **Milestone 0:** run Unsloth's GRPO notebook unchanged on a Colab T4 (`nb/Qwen2.5_(3B)-GRPO.ipynb` from unslothai/notebooks). Success = the reward table prints and you can name what each column is. ~3 units, ~1.5 hours. You are proving the machinery, not training a model. **(done 2026-07-15: 250 steps, 1h40m, ~3 units. Observed: ~1/3 of steps had reward_std=0 → zero gradient; 200-token completion cap clipped ~90% of early rollouts → model adapted by compressing reasoning; correct-but-unit-suffixed answers ("8 GB") scored 0 under exact string match — the false-negative class execution grading eliminates.)**
 
 **Learn block 0** (companion reading — llm-foundations site, your friend-circle's series): Modules 02–05 (tokenization, transformer, attention, positional encoding) if any feel shaky; Module 10 (decoding & sampling) *before* Phase 1, because pass@1 estimation is a sampling question.
 
