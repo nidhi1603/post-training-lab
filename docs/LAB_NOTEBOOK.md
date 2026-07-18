@@ -325,3 +325,12 @@ Full table (61 dev bugs, k=16 @ temp 1.0, seed 3407):
 - **DECISION**: SFT arm recipe = no-trace × 1 epoch. `sft_notrace_s3407_ep1` is
   also the shared init for the DPO and GRPO arms (same-init design). Trace-arm
   adapters kept on Drive for the writeup.
+
+## S2.7 Rank ablation queued (2026-07-18)
+
+- Nidhi asked about r=16/α=32 → built `notebooks/05b_rank_ablation.ipynb`:
+  one knob (r 32→16, α kept at 2r), seed 3407, winning recipe otherwise,
+  ~20 min L4. Verdict cell compares vs the r32 cross-seed spread from 05.
+- **Prediction on record: within noise ("rank didn't matter; epochs did").**
+  Study config stays r=32/α=64 regardless — this is a write-up ablation only.
+- Run order: 05 FIRST (produces the noise ruler), then 05b.
