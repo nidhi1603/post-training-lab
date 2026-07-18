@@ -99,6 +99,20 @@ to load-bearing. Phase 1 promoted exactly one — SFT (Qwen's amplification ceil
 | **2604.01302** RL exceeds SFT coverage (competitive programming) | Counterpoint: RL can expand beyond SFT-reachable in some regimes | Cited in paper framing; ceiling treated as indicative |
 | **2606.09932** "When RL Fails after SFT" / **2604.23747** SFT-then-RL vs mixed | Handoff plasticity matters; sequential beats mixed | Supports existing arm ordering; cite in related work |
 
+## Pass 3 — 2026-07-18 (arXiv newest window, Jul 10–18)
+
+**No plan changes.** Notable:
+- **2607.04232 SpecCoder** — trains Qwen2.5-Coder on validated programs + *behavior-changing
+  mutants*: third independent convergence on mutation-made training data (with Repair-R1
+  and our A1). Cite as A1 validation.
+- **2607.11022 leaky rewards (refined reading)** — test-suite false positives cause
+  *persistent, asymmetric* errors in code RLVR; authors propose static reward-suite
+  auditing. Strengthens (not softens) the gold-sanity gate.
+- **2607.13399 on-policy distillation pathologies** — Student-Teacher Mismatch +
+  Length Exploitation: same capacity-gap story as Through-the-Valley; cite beside A2.
+- Skipped per standing rule: week's GRPO variants (2607.14614, SCOPE-RL, RSI) =
+  debugging menu; off-domain SFT papers.
+
 ## The three-question checklist before believing any "amazing result"
 
 1. Is the test set truly **out-of-distribution** from training?
