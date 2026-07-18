@@ -6,9 +6,9 @@ setting below still says `TODO`, the protocol is not yet frozen and no arm may b
 compared. Freezing = filling every field, committing this file, and recording the
 commit hash in the paper's reproducibility statement.
 
-Status: **DRAFT — Qwen baseline measured and TARGET LOCKED (2026-07-15); full freeze
-pending the Llama baseline run.** After that, change this line to
-`FROZEN as of <commit hash> on <date>` and stop editing.
+Status: **FROZEN on 2026-07-18** (both baselines measured; the freezing commit is
+recorded in git history). From this point, this file receives no edits — any
+deviation forced by reality gets a dated note in the paper's limitations instead.
 
 ---
 
@@ -69,7 +69,14 @@ changes.** Never compare checkpoint A at one temperature with checkpoint B at an
 
 - Base pass@1 measured: **17.59%** (Qwen2.5-Coder-1.5B-Instruct, 2026-07-15; pass@10 = 23.50%;
   rough 95% CI ≈ ±6 pts, exact clustered CI to be computed from per-problem results).
-  Llama-3.2-3B-Instruct: `TODO — second run of the same notebook`.
+  **Llama-3.2-3B-Instruct: 29.94%** (2026-07-18; pass@10 = 47.35%; model revision
+  `0cb88a4f764b7a12671c53f0838cd831a0843b95`; loaded from local snapshot after a hub
+  sharded-resolution failure — dated note, not a protocol change).
+- Role note (pre-committed in the master workflow): Llama is the **cross-family
+  validation arm** — it is compared only against its own baseline, never against the
+  OctoCoder target. Its base (~29.9%) already sits at the OctoCoder line, so
+  "Llama beats OctoCoder" would be a trivial non-claim; the headline claim structure
+  remains Qwen-primary.
 - Decision rule (pre-committed): base < 30.4% → target = beat **OctoCoder-16B (30.4%)**;
   stretch = GPT-4 row (~47%). Base ≥ 30.4% → target = GPT-4 row.
 - **LOCKED TARGET (2026-07-15): 17.59% < 30.4% → beat OctoCoder-16B's 30.4% pass@1

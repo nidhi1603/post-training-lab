@@ -69,7 +69,7 @@ Colab Pro ≈ 300 units. Plan ≈ 175. Update this table as you burn units.
 | Phase | Budgeted units | Spent | Notes |
 |---|---|---|---|
 | 0 Setup / Milestone 0 | ~3 | ~3 (2026-07-15) | Unsloth GRPO notebook unchanged — 250 steps, T4, 1h40m |
-| 1 Baseline (Qwen + Llama) | ~15 | ~10–15 est. (Qwen done 2026-07-15; Llama pending) | L4; n=20 each; Qwen pass@1 = 17.59% |
+| 1 Baseline (Qwen + Llama) | ~15 | ~8–12 est. (both done; Llama gen took only ~37 min on L4) | Qwen 17.59% / Llama 29.94% pass@1 |
 | 2 Data pipeline | ~10 + API | | teacher-model API separate |
 | 3 SFT ×3 seeds | ~15 | | |
 | 4 DPO ×3 seeds | ~10 | | |
@@ -80,12 +80,17 @@ Colab Pro ≈ 300 units. Plan ≈ 175. Update this table as you burn units.
 
 ## Status
 
-**Phase 0 complete.** **Phase 1 in progress:** Qwen baseline measured 2026-07-15 —
-**pass@1 = 17.59%** (pass@10 = 23.50%) on `humanevalfixtests-python`, full frozen
-protocol, harness commit `8fc5bae`. **Target locked per the pre-committed gate: beat
-OctoCoder-16B (30.4%) at 1.5B; stretch GPT-4 (~47%).** Remaining in Phase 1: Llama-3.2-3B
-baseline (same notebook, 3 config changes), then freeze `EVAL_PROTOCOL.md`. Phase 2 kickoff:
-raw-generation audit of the baseline failures + the A1 mutation pipeline.
+**Phases 0–1 COMPLETE (2026-07-18). Protocol FROZEN.**
+
+| Model | pass@1 | pass@10 |
+|---|---|---|
+| Qwen2.5-Coder-1.5B-Instruct (primary) | **17.59%** | 23.50% |
+| Llama-3.2-3B-Instruct (validation arm) | **29.94%** | 47.35% |
+
+Locked target (pre-committed gate): **beat OctoCoder-16B's 30.4% with the 1.5B Qwen**;
+stretch GPT-4 (~47%). Harness commit `8fc5bae`. Both models show large pass@10−pass@1
+gaps — latent ability for RL to amplify. **Phase 2 next:** raw-generation failure audit
++ feed MBPP+ through `src/mutate.py` (the A1 bug factory, built & tested) to make data v0.
 
 ## License
 
