@@ -352,3 +352,36 @@ Full table (61 dev bugs, k=16 @ temp 1.0, seed 3407):
 - A100 timing: 56 steps in 51 s (2× L4). Adapter saved:
   Drive `phase3/sft_notrace_r16_s3407_ep1`, eval `dev_eval_r16_ep1_seed3407.json`.
 - Notebook 05 (3 seeds + restraint probe) still TO RUN — the critical path.
+
+## S2.9 Notebook-05 RESULTS — Phase 3 dev-side COMPLETE (2026-07-18, A100)
+
+Cross-seed table (61 dev bugs, k=16 @ temp 1.0):
+
+| tag | pass@1 | pass@16 | gap |
+|---|---|---|---|
+| base | 45.9% | 93.4% | 47.5 |
+| ep1_seed3407 (L4) | 58.7% | 91.8% | 33.1 |
+| ep1_seed42 | 60.2% | 93.4% | 33.2 |
+| ep1_seed1234 | 59.5% | 90.2% | 30.6 |
+
+- **SFT arm dev result: pass@1 59.5% ± 0.8 (sd), pass@16 91.8% ± 1.6.** Gate
+  passed on every seed (+13–14 pts over base). Recipe is STABLE across seeds
+  (pass@1 spread just 1.5 pts) and across L4-vs-A100 hardware.
+- **NOISE RULER (official): pass@1 spread 1.5 pts / sd 0.8; pass@16 spread 3.3 /
+  sd 1.6.** This is the tie threshold for all future dev-slice comparisons.
+- **RL-init (pre-committed rule = highest dev pass@16): seed 42**
+  (`phase3/sft_notrace_s42_ep1`, 93.4 pass@16, also top pass@1 60.2).
+- **Rank ablation FINAL verdict — my prediction was WRONG**: r16 pass@1 56.8 is
+  1.9 pts below the worst r32 seed (58.7) and ~3.4 sd below the r32 mean →
+  OUTSIDE the ruler. Halving rank has a small but real pass@1 cost (~2.7 pts),
+  pass@16 unaffected (93.4, within range). Hardware confound now largely
+  excluded (r32 seeds 42/1234 also ran on A100 and matched the L4 seed).
+  Study config r=32/α=64 vindicated. Honest note for write-up: "rank mattered
+  a little; epochs mattered a lot."
+- **Restraint probe (32 correct dev functions, k=4 @ temp 1.0)**: still-passes
+  68/75/68%, returned-unchanged 28/31/32% across seeds. I.e. shown CORRECT code,
+  the SFT model breaks it ~25–30% of the time at exploration temperature.
+  CAVEATS: no BASE-model probe run yet (missing control — open item), exam
+  decode is temp 0.2 (far more conservative), and every exam item has a real
+  bug. Matters most for GRPO reward-hacking watch. TODO: base restraint probe.
+- A100 note: dev evals ~2× faster than L4; ~51 s/epoch training.

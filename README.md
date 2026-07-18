@@ -95,8 +95,15 @@ contamination-screened, function-level splits) + 374-function restraint suite, a
 `data/`. Routing pass done (A2): **97 sft / 376 rl / 71 easy** — learnable fraction
 **69.1%** (variance gate needs ≥30% → GRPO pre-flight passed early). Mean base pass
 rate on train bugs 51.2% (vs 17.6% on exam — curriculum easier than exam, as designed).
-Routing detail: Drive `phase2/routing_v0.json`. **Phase 3 next:** SFT arm — no-trace
-vs short-trace A/B (A2), then 3 seeds, early-stop by dev pass@16 + entropy.
+Routing detail: Drive `phase2/routing_v0.json`.
+
+**Phase 3 dev-side COMPLETE (2026-07-18):** recipe locked by two A/Bs — **no-trace
+targets, 1 epoch** (epoch 2 collapses dev pass@16 91.8→82.0; DeepSeek short-trace
+distillation loses 7.1 pts pass@1 at matched budget — negative result, kept).
+3-seed dev result: **pass@1 59.5% ± 0.8, pass@16 91.8% ± 1.6** (base 45.9/93.4).
+Rank ablation: r=16 costs ~2.7 pts pass@1 (outside the cross-seed ruler) — r=32
+stays. RL-init (pre-committed highest dev pass@16): seed 42. **Next:** notebook 06
+— held-out milestone eval of all 3 seeds, then Phase 4 DPO.
 
 ## License
 
