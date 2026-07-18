@@ -334,3 +334,21 @@ Full table (61 dev bugs, k=16 @ temp 1.0, seed 3407):
 - **Prediction on record: within noise ("rank didn't matter; epochs did").**
   Study config stays r=32/α=64 regardless — this is a write-up ablation only.
 - Run order: 05 FIRST (produces the noise ruler), then 05b.
+
+## S2.8 Rank ablation result (2026-07-18, run on A100 — note hardware confound)
+
+| config | params | pass@1 | pass@16 | gap |
+|---|---|---|---|---|
+| r=32/α=64 (study, L4) | 36.9M | 58.7% | 91.8% | 33.1 |
+| r=16/α=32 (A100) | 18.5M | 56.8% | 93.4% | 36.7 |
+
+- Δpass@1 = −1.9, Δpass@16 = +1.6 — both within analytic noise (~2–3 pts / 61
+  bugs). **Provisional: prediction held — rank didn't matter, epochs did.**
+  Final call after notebook 05's cross-seed spread (the real ruler).
+- CONFOUND (honest): rank AND hardware changed together (L4 vs A100 numerics).
+  Acceptable for a dev-slice ablation; frozen exam runs stay L4/bf16.
+- Direction consistent with capacity story (smaller adapter drifted less from
+  base, pass@16 back at 93.4) — noted, not claimed.
+- A100 timing: 56 steps in 51 s (2× L4). Adapter saved:
+  Drive `phase3/sft_notrace_r16_s3407_ep1`, eval `dev_eval_r16_ep1_seed3407.json`.
+- Notebook 05 (3 seeds + restraint probe) still TO RUN — the critical path.
