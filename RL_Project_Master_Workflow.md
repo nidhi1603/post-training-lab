@@ -297,3 +297,30 @@ Gemini API terms restrict using outputs to train models; this project ships a pu
 ### A1.5 Unchanged
 
 Benchmark, harness, prompt-format freeze, decode settings, targets, gold-sanity gate, matched budgets, all ground rules, all phase gates. Phase-2 GPU/API budget unchanged (~10 units + API); mutation injection is CPU-cheap and *reduces* teacher-API spend vs. generating tests for every commit-mined problem.
+
+---
+
+## Amendment A2 (2026-07-18) — SFT-stage refinements, triggered by the Phase-1 audit
+
+*Trigger: the audit (eval/results/phase1_audit.md) showed Qwen's pure-amplification
+ceiling (~25.6%, 42/164 reachable) sits BELOW the locked 30.4% target — SFT is
+load-bearing, so its design corner earned a targeted literature pass. Nothing frozen
+is touched; all changes live in not-yet-executed Phases 2–3.*
+
+1. **Trace policy hardened (Phase 2/3):** SFT traces stay SHORT (≤512 think tokens),
+   now backed by "Through the Valley" (arXiv 2506.07712, EMNLP 2025): ≤3B models
+   (incl. Qwen2.5-1.5B) suffer Long-CoT Degradation on limited long-trace data (up to
+   −75%). Add a one-seed dev-slice A/B *before* the 3-seed run: short-trace SFT vs
+   direct-fix (no-trace) SFT; commit the winner.
+2. **SFT early-stopping by headroom, not loss (Phase 3):** stop/select checkpoints by
+   dev pass@16 + entropy, explicitly to avoid the SFT entropy/diversity collapse that
+   shrinks the pass@k−pass@1 gap RL feeds on (CurioSFT 2602.02244, SED-SFT
+   2602.07464, overtraining→rank-inversion 2606.18487, divergence choice 2509.07430).
+   We adopt the *monitoring/stopping rule only* — no custom SFT losses (arm integrity).
+3. **Stage-specific data routing (Phase 2):** when sampling the base model on training
+   bugs (already required for the variance gate), route by outcome: all-fail → weighted
+   into SFT set (expansion), mixed-outcome → RL set (learnable signal), all-pass →
+   restraint/discard (Stage-Specific Data, 2606.04466).
+4. **Counterpoint logged for the paper:** RL can genuinely exceed SFT-reachable
+   coverage in some regimes (2604.01302) — the audit's 25.6% ceiling is indicative,
+   not a law; frame accordingly.

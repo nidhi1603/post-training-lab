@@ -85,6 +85,20 @@ Repair-R1's test-first co-training.
 
 ---
 
+## Pass 2 — 2026-07-18 (targeted: SFT design, triggered by Phase-1 audit)
+
+*Trigger discipline: results earn a literature pass only when they promote a decision
+to load-bearing. Phase 1 promoted exactly one — SFT (Qwen's amplification ceiling
+25.6% < 30.4% target). This pass looked only there.*
+
+| Paper | Claim | Action taken (Amendment A2) |
+|---|---|---|
+| **2506.07712** "Through the Valley" (EMNLP 2025) | ≤3B models (incl. Qwen2.5-1.5B) lose up to 75% from limited long-CoT SFT; error accumulation | Trace cap ≤512 hardened into a rule; one-seed A/B short-trace vs no-trace before 3-seed commit |
+| **2602.02244** CurioSFT / **2602.07464** SED-SFT / **2606.18487** overtraining→entropy collapse / **2509.07430** divergence choice | Standard SFT collapses entropy/diversity; pass@1 up, pass@k−pass@1 gap down → starves downstream RL | Early-stop SFT by dev pass@16 + entropy (monitoring rule only; no custom losses) |
+| **2606.04466** Stage-specific data for SFT-then-RL | SFT wants can't-do problems (expand); RL wants mixed-outcome (signal) | Data routing rule in Phase 2 (free — reuses variance-gate sampling) |
+| **2604.01302** RL exceeds SFT coverage (competitive programming) | Counterpoint: RL can expand beyond SFT-reachable in some regimes | Cited in paper framing; ceiling treated as indicative |
+| **2606.09932** "When RL Fails after SFT" / **2604.23747** SFT-then-RL vs mixed | Handoff plasticity matters; sequential beats mixed | Supports existing arm ordering; cite in related work |
+
 ## The three-question checklist before believing any "amazing result"
 
 1. Is the test set truly **out-of-distribution** from training?
