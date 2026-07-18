@@ -6,8 +6,9 @@ setting below still says `TODO`, the protocol is not yet frozen and no arm may b
 compared. Freezing = filling every field, committing this file, and recording the
 commit hash in the paper's reproducibility statement.
 
-Status: **DRAFT — not yet frozen** (fill in Phase 1, then change this line to
-`FROZEN as of <commit hash> on <date>` and stop editing).
+Status: **DRAFT — Qwen baseline measured and TARGET LOCKED (2026-07-15); full freeze
+pending the Llama baseline run.** After that, change this line to
+`FROZEN as of <commit hash> on <date>` and stop editing.
 
 ---
 
@@ -22,16 +23,19 @@ Status: **DRAFT — not yet frozen** (fill in Phase 1, then change this line to
 ## Harness
 
 - Harness: **bigcode-evaluation-harness**.
-- Git commit hash: `TODO — record exact commit`.
-- Install command / container: `TODO`.
+- Git commit hash: `8fc5bae6479c4fbbb28c3f8b644f6a15b3f3b5bd` (recorded from the Phase-1 run, 2026-07-15).
+- Install: `git clone https://github.com/bigcode-project/bigcode-evaluation-harness && pip install -e .` on Colab L4, then `pip install -U transformers accelerate`.
 
 ## Prompt format
 
-- Chosen format: `TODO` (candidates: `--prompt instruct` and the harness alternatives).
-- Selection procedure: ran 20 problems per candidate on Qwen2.5-Coder-1.5B-Instruct,
-  read raw generations, picked the one with no malformed outputs. (FormatSpread,
-  arXiv 2310.11324 — formatting alone swings results; that is why we freeze it.)
-- Frozen prompt template: `TODO — paste verbatim`.
+- Chosen format: **`--prompt instruct`** (used for the Phase-1 baseline run, 2026-07-15).
+- Note: the harness's post-processing extracted code well enough to produce a plausible
+  score distribution; a raw-generation audit (failure taxonomy read) is scheduled as the
+  first step of Phase 2 and any format pathology found there gets a dated note here —
+  the format itself does not change. (FormatSpread, arXiv 2310.11324 — formatting alone
+  swings results; that is why we freeze it.)
+- Frozen prompt template: the harness `humanevalfixtests-python` task's `instruct`
+  template at commit `8fc5bae` (see harness source for verbatim text).
 
 ## Decode settings (identical for every headline number)
 
@@ -40,7 +44,9 @@ Status: **DRAFT — not yet frozen** (fill in Phase 1, then change this line to
 | temperature | 0.2 |
 | top_p | 0.95 |
 | n_samples | 20 |
-| max_new_tokens | `TODO` |
+| max_length_generation | 2048 (total sequence budget — generous on purpose so reasoning-style checkpoints are never truncated by the ruler) |
+| batch_size | 16 (1.5B) / 8 (3B) |
+| seed | 0 |
 | execution | `--allow_code_execution` |
 | GPU / dtype | L4, bfloat16 (T4 lacks bf16) |
 
@@ -61,10 +67,14 @@ changes.** Never compare checkpoint A at one temperature with checkpoint B at an
 
 ## Targets (locked in Phase 1, step 5 — no goalpost-moving)
 
-- Base pass@1 measured: `TODO %` (Qwen), `TODO %` (Llama), each with 95% CI.
-- If base < 30.4% → target = beat **OctoCoder-16B (30.4%)**; stretch = GPT-4 row (~47%).
-- If base ≥ 30.4% → target = GPT-4 row, or the harder language splits.
-- Locked target: `TODO`.
+- Base pass@1 measured: **17.59%** (Qwen2.5-Coder-1.5B-Instruct, 2026-07-15; pass@10 = 23.50%;
+  rough 95% CI ≈ ±6 pts, exact clustered CI to be computed from per-problem results).
+  Llama-3.2-3B-Instruct: `TODO — second run of the same notebook`.
+- Decision rule (pre-committed): base < 30.4% → target = beat **OctoCoder-16B (30.4%)**;
+  stretch = GPT-4 row (~47%). Base ≥ 30.4% → target = GPT-4 row.
+- **LOCKED TARGET (2026-07-15): 17.59% < 30.4% → beat OctoCoder-16B's 30.4% pass@1
+  with the 1.5B model. Stretch: GPT-4's ~47%. Gap to close: ~+12.8 points.
+  No goalpost-moving after this line.**
 
 ## Contamination rule
 
