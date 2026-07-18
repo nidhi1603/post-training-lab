@@ -1,0 +1,18 @@
+[
+ {
+  "task_id": 99,
+  "reason": "name collision: ['decimal_to_binary']"
+ },
+ {
+  "task_id": 119,
+  "reason": "name collision: ['search']"
+ },
+ {
+  "task_id": 309,
+  "reason": "name collision: ['maximum']"
+ },
+ {
+  "task_id": 626,
+  "reason": "name collision: ['triangle_area']"
+ }
+]
