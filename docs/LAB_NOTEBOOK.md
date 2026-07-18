@@ -248,3 +248,29 @@ test_imports, test_list}`.
 - LinkedIn post (i) fully writeable; budget ledger habit.
 - Commit chain addition (session 2): dcd93ab prompts+03 → 005c197 Phase-2 complete →
   5dd7072 notebook 04 → (this save).
+
+## S2.4 Notebook-04 VERDICT (2026-07-18, seed 3407, 61 dev bugs, k=16 @ temp 1.0)
+
+| checkpoint | pass@1 | pass@16 | gap |
+|---|---|---|---|
+| base | 45.9% | 93.4% | 47.5 |
+| ep1  | 58.7% | 91.8% | 33.1 |
+| ep2  | 62.4% | 82.0% | 19.6 |
+
+- **Gate PASSED**: both epochs beat base pass@1 (45.9 → 58.7 → 62.4). The teaching
+  loop (mixture, response-masking, QLoRA r32/α64) works end-to-end.
+- **Epoch 2 is the trap A2 predicted**: highest pass@1 but pass@16 collapsed
+  91.8 → 82.0 (~7 dev bugs newly unreachable at k=16) and gap 33.1 → 19.6.
+  Train loss ~0.06 flat in ep2 = memorization. Selecting by pass@1 would have
+  picked it; the pre-committed pass@16 rule rejected it. (Interview gold.)
+- **DECISION: no-trace recipe = 1 epoch.** Ep1 trades ~1 bug of pass@16 (within
+  noise vs base 93.4) for +12.8 pass@1 — the RL-init profile we want.
+- Context guard: dev ≫ exam by design (base dev 45.9 vs exam 17.6). Relative
+  decisions only, never headline numbers.
+- Run health: ~1:42 per epoch on L4 (56 steps, batch 8×2); warnings observed
+  (max_new_tokens/max_length, AttentionMaskConverter deprecation, warmup_ratio
+  deprecation) all benign. Adapters + dev evals on Drive phase3/.
+- 04b_trace_gen.ipynb built & pushed (962f983): CPU, DeepSeek teacher, key via
+  Colab Secrets, verified-by-execution, checkpoint-resume, runs in parallel w/ 04.
+- Next: run 04b → 04c trace-arm A/B (same protocol, both epochs + dev evals) →
+  winner gets 3 seeds.
