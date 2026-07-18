@@ -291,3 +291,37 @@ test_imports, test_list}`.
   Adds `base2` re-eval as a NOISE RULER (|base−base2| = tie threshold), and its
   final cell loads 04's dev_eval jsons from Drive to print the six-row A/B table.
 - Reminded: disconnect 04's L4 runtime (idle burn); units balance still unreported.
+
+## S2.6 A/B VERDICT — no-trace WINS (2026-07-18, notebook 04c)
+
+Full table (61 dev bugs, k=16 @ temp 1.0, seed 3407):
+
+| arm | ckpt | pass@1 | pass@16 | gap |
+|---|---|---|---|---|
+| no-trace | base | 45.9% | 93.4% | 47.5 |
+| no-trace | ep1 | **58.7%** | **91.8%** | 33.1 |
+| no-trace | ep2 | 62.4% | 82.0% | 19.6 |
+| trace | base2 | 45.9% | 93.4% | 47.5 |
+| trace | ep1 | 48.9% | 90.2% | 41.3 |
+| trace | ep2 | 51.6% | 91.8% | 40.2 |
+
+- **Pre-committed rule applied**: best-epoch vs best-epoch → pass@16 TIES at 91.8
+  (no-trace ep1 vs trace ep2) → tie-break by pass@1 → no-trace ep1 wins by 7.1 pts
+  (≫ analytic sampling noise ~2–3 pts on 61 bugs). **WINNER: no-trace, 1 epoch.**
+- **Negative result (content, per ground rule 7)**: short teacher traces did NOT
+  expand the reachable set (pass@16 no better) and slowed repair learning at
+  matched budget (train loss 0.35–0.44 vs 0.10; pass@1 +5.7 after 2 ep vs +12.8
+  after 1). Observed trace-quality caveat: sampled diagnosis was partially wrong
+  (claimed capitalize() issue that wasn't one) even though the fix verified —
+  noisy rationales plausibly hurt a 1.5B student.
+- **Interesting secondary effect**: traces act as an anti-collapse regularizer —
+  trace ep2 kept pass@16 at 91.8 where no-trace ep2 collapsed to 82.0. Slower but
+  gentler; still loses at matched budget.
+- **Noise-ruler design flaw discovered (honest note)**: base2 == base EXACTLY
+  (45.9/93.4/47.5) because both notebooks replay seed 3407 → same RNG stream →
+  same samples. We accidentally proved end-to-end determinism across two fresh
+  VMs (nice), but measured reproducibility, not noise. Real noise ruler = cross-
+  seed spread from notebook 05.
+- **DECISION**: SFT arm recipe = no-trace × 1 epoch. `sft_notrace_s3407_ep1` is
+  also the shared init for the DPO and GRPO arms (same-init design). Trace-arm
+  adapters kept on Drive for the writeup.
