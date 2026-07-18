@@ -274,3 +274,20 @@ test_imports, test_list}`.
   Colab Secrets, verified-by-execution, checkpoint-resume, runs in parallel w/ 04.
 - Next: run 04b → 04c trace-arm A/B (same protocol, both epochs + dev evals) →
   winner gets 3 seeds.
+
+## S2.5 Notebook-04b RESULTS (2026-07-18) + 04c built
+
+- **Trace generation: 522/544 verified (96.0%)** in 341 s, $0.13 (134,694 in /
+  83,925 out tokens). Mean diagnosis 57 words (cap 120).
+- By pile: sft 82/97 (85%), rl 369/376 (98%), easy 71/71. By category, lowest =
+  missing_logic 66/74 (reconstructing deleted code from tests alone is hardest).
+- Smoke diagnoses healthy — teacher names the actual bug crisply.
+- 22 uncovered bugs (15 sft-pile, 7 rl) fall back to gold-fix targets in 04c.
+- Artifacts: Drive `phase3/traces_v0.json` (verified only) + `traces_ckpt.json` (all).
+- **04c_sft_trace.ipynb built**: identical twin of 04 (seed 3407, same mixture
+  recipe/LoRA/trainer/dev-eval) except targets = teacher diagnosis + verified fix
+  (fallback gold). Restraint gets template diagnoses (3 variants via rng2 so the
+  main rng stream — restraint picks + final shuffle — matches 04 exactly).
+  Adds `base2` re-eval as a NOISE RULER (|base−base2| = tie threshold), and its
+  final cell loads 04's dev_eval jsons from Drive to print the six-row A/B table.
+- Reminded: disconnect 04's L4 runtime (idle burn); units balance still unreported.
