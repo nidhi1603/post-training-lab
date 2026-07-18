@@ -171,14 +171,70 @@ def _mutants_missing(source):
         yield Mutant("missing_logic", f"deleted statement: {ast.unparse(removed)!r}", _unparse(tree))
 
 
+# Excess-logic v2 (data v0 finding: naive duplication was ~always equivalent —
+# recomputing a pure value is invisible. Only EFFECTFUL insertions make real bugs.)
+_MUTATOR_CALLS = {"append", "add", "insert", "extend", "remove", "pop", "discard",
+                  "update", "sort", "reverse", "clear"}
+
+
+def _is_effectful(stmt) -> bool:
+    """Would executing this statement twice differ from once?"""
+    if isinstance(stmt, ast.AugAssign):
+        return True
+    if isinstance(stmt, ast.Assign):
+        targets = {t.id for t in stmt.targets if isinstance(t, ast.Name)}
+        rhs = {n.id for n in ast.walk(stmt.value) if isinstance(n, ast.Name)}
+        return bool(targets & rhs)  # e.g. s = s + x
+    if isinstance(stmt, ast.Expr) and isinstance(stmt.value, ast.Call):
+        f = stmt.value.func
+        return isinstance(f, ast.Attribute) and f.attr in _MUTATOR_CALLS
+    return False
+
+
+def _dup_sites(tree):
+    for node, field, i in _stmt_sites(tree, min_len=1):
+        if _is_effectful(getattr(node, field)[i]):
+            yield (node, field, i)
+
+
+def _loop_sites(tree):
+    for node in ast.walk(tree):
+        if isinstance(node, (ast.For, ast.While)):
+            yield node
+
+
+def _hoist_sites(tree):
+    for node in ast.walk(tree):
+        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+            body = node.body
+            start = 1 if body and _is_docstring(body[0]) else 0
+            if len(body) - start >= 2 and isinstance(body[-1], ast.Return):
+                yield node
+
+
 def _mutants_excess(source):
     base = ast.parse(source)
-    for n in range(sum(1 for _ in _stmt_sites(base, min_len=1))):
+    for n in range(sum(1 for _ in _dup_sites(base))):
         tree = ast.parse(source)
-        node, field, i = list(_stmt_sites(tree, min_len=1))[n]
+        node, field, i = list(_dup_sites(tree))[n]
         lst = getattr(node, field)
         lst.insert(i, copy.deepcopy(lst[i]))
-        yield Mutant("excess_logic", f"duplicated statement: {ast.unparse(lst[i])!r}", _unparse(tree))
+        yield Mutant("excess_logic",
+                     f"duplicated effectful statement: {ast.unparse(lst[i])!r}",
+                     _unparse(tree))
+    for n in range(sum(1 for _ in _loop_sites(base))):
+        tree = ast.parse(source)
+        list(_loop_sites(tree))[n].body.append(ast.Break())
+        yield Mutant("excess_logic", "inserted spurious break at end of loop body",
+                     _unparse(tree))
+    for n in range(sum(1 for _ in _hoist_sites(base))):
+        tree = ast.parse(source)
+        fn = list(_hoist_sites(tree))[n]
+        start = 1 if _is_docstring(fn.body[0]) else 0
+        fn.body.insert(start, copy.deepcopy(fn.body[-1]))
+        yield Mutant("excess_logic",
+                     f"inserted premature {ast.unparse(fn.body[start])!r}",
+                     _unparse(tree))
 
 
 def _call_sites(tree):

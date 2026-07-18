@@ -67,6 +67,25 @@ def test_missing_and_excess_logic_on_loop():
     assert any(validate_mutant(TOTAL_SRC, m.source, TOTAL_TEST) == "valid" for m in excess)
 
 
+def test_excess_v2_yields_mostly_real_bugs_on_loops():
+    # TOTAL_SRC offers all three excess flavors: effectful dup (s = s + x),
+    # spurious break, premature return. Most should certify as REAL bugs now.
+    excess = generate_mutants(TOTAL_SRC, categories=["excess_logic"])
+    kinds = {m.description.split(":")[0].split(" '")[0] for m in excess}
+    assert len(excess) >= 3
+    verdicts = [validate_mutant(TOTAL_SRC, m.source, TOTAL_TEST) for m in excess]
+    assert verdicts.count("valid") >= 2, (kinds, verdicts)
+
+
+def test_excess_v2_skips_pure_recompute_duplication():
+    # y = x + 1 is pure recompute: duplicating it is invisible, so the only
+    # excess candidate should be the premature-return hoist, not a dup.
+    src = "def inc(x):\n    y = x + 1\n    return y\n"
+    excess = generate_mutants(src, categories=["excess_logic"])
+    assert all("duplicated" not in m.description for m in excess)
+    assert any("premature" in m.description for m in excess)
+
+
 def test_value_mutant_off_by_one():
     ms = generate_mutants(TOTAL_SRC, categories=["value_misuse"])
     assert any(
