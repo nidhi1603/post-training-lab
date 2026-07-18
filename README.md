@@ -88,9 +88,15 @@ Colab Pro ≈ 300 units. Plan ≈ 175. Update this table as you burn units.
 | Llama-3.2-3B-Instruct (validation arm) | **29.94%** | 47.35% |
 
 Locked target (pre-committed gate): **beat OctoCoder-16B's 30.4% with the 1.5B Qwen**;
-stretch GPT-4 (~47%). Harness commit `8fc5bae`. Both models show large pass@10−pass@1
-gaps — latent ability for RL to amplify. **Phase 2 next:** raw-generation failure audit
-+ feed MBPP+ through `src/mutate.py` (the A1 bug factory, built & tested) to make data v0.
+stretch GPT-4 (~47%). Harness commit `8fc5bae`.
+
+**Phase 2 COMPLETE (2026-07-19):** data v0.1 = 672 certified bugs (taxonomy-balanced,
+contamination-screened, function-level splits) + 374-function restraint suite, all in
+`data/`. Routing pass done (A2): **97 sft / 376 rl / 71 easy** — learnable fraction
+**69.1%** (variance gate needs ≥30% → GRPO pre-flight passed early). Mean base pass
+rate on train bugs 51.2% (vs 17.6% on exam — curriculum easier than exam, as designed).
+Routing detail: Drive `phase2/routing_v0.json`. **Phase 3 next:** SFT arm — no-trace
+vs short-trace A/B (A2), then 3 seeds, early-stop by dev pass@16 + entropy.
 
 ## License
 
