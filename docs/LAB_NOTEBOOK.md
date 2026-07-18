@@ -1,7 +1,8 @@
 # LAB_NOTEBOOK.md — complete session state
 
-*Session 1 closed 2026-07-18 (late night). This file is the full-detail handoff: read it
-top to bottom and you can continue the project with zero missing context.*
+*Session 1 closed 2026-07-18 (late night); Session 2 log appended 2026-07-19 — see
+"SESSION 2" section near the end, it supersedes sections 1 and 6 where they differ.
+Read top to bottom and you can continue the project with zero missing context.*
 
 ---
 
@@ -152,3 +153,98 @@ test_imports, test_list}`.
   visible/hidden test pools for RL reward.
 - DPO pair generation + DeepSeek teacher account: not yet set up (needed Phase 3/4).
 - Weekly budget-ledger habit + LinkedIn post (i): suggested, not yet done.
+
+---
+---
+
+# SESSION 2 — 2026-07-19 (supersedes sections 1 & 6 above where they differ)
+
+## S2.1 What happened, in order
+
+1. Morning check: repo in sync at `808b48c`, 72 tests green.
+2. Built **`src/prompts.py`** — THE canonical training-side prompt, used identically by
+   routing/SFT/DPO/GRPO (matched budgets ⇒ no arm gets a formatting advantage).
+   Details: `REPAIR_PROMPT` (buggy code + tests in ```python fences, "Return only the
+   fixed function in a Python code block"); `build_repair_prompt(buggy, test_list,
+   k_visible=3)` — shows AT MOST 3 tests (A1.3 visible/hidden lite: grading always
+   runs the FULL test_list); `extract_code(text)` — first ```python fence, else any
+   ``` fence, else raw text. +`tests/test_prompts.py` (5 tests) → **suite now 77 green**.
+3. Built + pushed **`notebooks/03_routing_pass.ipynb`** (commit `dcd93ab`): L4; k=8
+   attempts/bug at temp 1.0 top_p 0.95 max_new_tokens 512 (GRPO's regime);
+   PROMPTS_PER_BATCH=4 (32 seqs/forward); checkpoint-resume to Drive
+   `phase2/routing_samples_ckpt.json`; grading = subprocess + 6s timeout, 4 workers.
+4. **Nidhi ran it successfully.** Smoke healthy (note: model PARROTS the visible tests
+   into its answers at temp 1.0 — harmless for grading, but SFT targets must stay
+   clean gold fixes). Sampling took 2248s (~37 min) for 544 bugs.
+5. **ROUTING RESULTS (Phase 2 finale):**
+   - Piles: **sft 97 (17.8%) / rl 376 (69.1%) / easy 71 (13.1%)**
+   - **Learnable fraction 69.1%** vs gate ≥30% → **GRPO variance-gate pre-flight PASSED**
+   - Mean pass rate over all 4352 attempts: **51.2%** (vs 17.6% on exam — curriculum
+     easier than exam, as designed; the gap IS the headroom)
+   - Per-category sft/rl/easy: excess 5/49/12 · function 4/60/9 · missing 21/48/5 ·
+     operator 32/65/10 · value 27/46/3 · variable 8/108/32
+   - Insight for paper: on single-edit train bugs, SUBTLE (operator/value) beats
+     STRUCTURAL (excess) as hardest — reversal vs the exam's excess-logic-hardest.
+   - Files: Drive `phase2/routing_v0.json` (id, category, pass_count, n, pile) and
+     `phase2/routing_samples_ckpt.json` (ALL 4352 attempts — flagged as a ready-made
+     DPO pair source for Phase 4: per-bug passing+failing attempts side by side).
+6. **Phase 2 declared COMPLETE** (commit `005c197`, README updated).
+7. **DeepSeek:** Nidhi created the API account and topped up. Instructed to store the
+   key as Colab Secret **`DEEPSEEK_API_KEY`** (notebook access ON) — storage not yet
+   confirmed. Explained the trace-arm design to her (she independently re-derived
+   rejection-sampling distillation): teacher gets SAME prompt as student, NEVER the
+   gold fix (post-hoc rationalization ≠ diagnosis); short 2–4 sentence diagnosis +
+   fix; verified by EXECUTION not text-match (many valid fixes exist); fails →
+   discard, retry ≤2; coverage footnote (trace set ⊂ bug set, report both sizes).
+8. Built + pushed **`notebooks/04_sft_notrace.ipynb`** (commit `5dd7072`) — the FIRST
+   TRAINING RUN. Full spec:
+   - SEED 3407. Mixture: train bugs with sft-pile ×3 (97×3=291) + rl ×1 (376) +
+     easy ×1 (71) = 738, + 150 train-split restraint examples (target = function
+     unchanged) ≈ **888 examples, ~17% restraint**; seeded shuffle.
+   - Targets: '```python\n{fixed}\n```' (clean gold, fenced to match extract_code).
+   - Model: unsloth/Qwen2.5-Coder-1.5B-Instruct, 4-bit, max_seq 1024; LoRA r=32
+     α=64 dropout=0 on q/k/v/o/gate/up/down, use_gradient_checkpointing='unsloth'.
+   - Masking: `train_on_responses_only(instruction_part='<|im_start|>user\n',
+     response_part='<|im_start|>assistant\n')` — loss on answers only.
+   - Train: SFTConfig batch 8 × accum 2, lr 2e-4 cosine, warmup 0.05, TWO separate
+     1-epoch trainer.train() calls (fresh optimizer each — fine for tracer) with
+     dev-eval between; save_strategy 'no', adapters saved manually.
+   - Dev eval (`dev_eval`): 61 dev bugs × k=16, temp 1.0 top_p 0.95, max_new 512,
+     batch_prompts=2; metrics: pass@1 = mean(c/n), pass@16 = frac(c>0), gap =
+     headroom (A2 anti-collapse watch). Base eval via the untrained-LoRA≡base trick
+     BEFORE training. Outputs: Drive `phase3/dev_eval_{base,ep1,ep2}_seed3407.json`,
+     adapters `phase3/sft_notrace_s3407_ep{1,2}/`.
+   - Verdict logic printed in notebook: gate = ep pass@1 > base pass@1; RL-init by
+     highest pass@16; if ep2 gap << ep1 gap → epoch 2 ate headroom → prefer ep1.
+9. **STATUS AT SAVE: notebook 04 IS RUNNING in Nidhi's Colab right now.** Verdict
+   table (3 rows: base/ep1/ep2 × pass@1/pass@16/gap) NOT yet reported — it is the
+   FIRST thing to collect next session.
+
+## S2.2 Next actions (supersedes section 6)
+
+1. **Collect notebook-04 verdict table** (or debug if it failed — likely failure
+   spots: unsloth install/version drama, OOM at k=16 eval → drop batch_prompts to 1,
+   train_on_responses_only signature drift).
+2. Interpret per verdict logic above; declare tracer result.
+3. **Build 04b_trace_gen.ipynb** (CPU, zero GPU): DeepSeek API
+   (base_url https://api.deepseek.com, model 'deepseek-chat', key from Colab Secret
+   DEEPSEEK_API_KEY) generates short diagnosis+fix per train bug w/ same
+   build_repair_prompt; extract_code → execute vs FULL test_list → keep passers,
+   retry ≤2, enforce short traces (~≤512 tok); save trace dataset to Drive/repo.
+4. **04c**: SFT trace-arm, 1 seed, same everything as 04 except targets =
+   "diagnosis + fenced fix" → A/B verdict on dev (pass@1 AND gap; also compare
+   dataset sizes/coverage honestly).
+5. Winner → 3 seeds (Phase 3 proper) + forgetting probe + held-out milestone eval
+   (ONCE) with taxonomy + restraint tables.
+6. Then Phase 4 (DPO — remember routing_samples_ckpt.json as pair source) and
+   Phase 5 (GRPO per frozen plan + A2/A1 invariants).
+
+## S2.3 Standing open items (rollover)
+
+- Colab units balance: STILL unreported — ask again.
+- DEEPSEEK_API_KEY in Colab Secrets: told, unconfirmed.
+- eval/taxonomy.json per-problem map (E1) placeholder; contamination_report.md stub.
+- v1 data upgrades: MBPP+ full suites, CommitPackFT tier, hidden-test pools for RL.
+- LinkedIn post (i) fully writeable; budget ledger habit.
+- Commit chain addition (session 2): dcd93ab prompts+03 → 005c197 Phase-2 complete →
+  5dd7072 notebook 04 → (this save).
