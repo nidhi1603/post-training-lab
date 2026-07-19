@@ -385,3 +385,15 @@ Cross-seed table (61 dev bugs, k=16 @ temp 1.0):
   decode is temp 0.2 (far more conservative), and every exam item has a real
   bug. Matters most for GRPO reward-hacking watch. TODO: base restraint probe.
 - A100 note: dev evals ~2× faster than L4; ~51 s/epoch training.
+
+## S2.10 Environment drift incident (2026-07-18, notebook 06 fresh L4 VM)
+
+- `pip install unsloth` now pulls a torchao release built for a newer torch than
+  Colab's preinstalled 2.10 → `AttributeError: '_c10d_functional' ... no
+  attribute '_wrap_tensor_autograd'` at `from unsloth import FastLanguageModel`
+  (import chain: unsloth_zoo → transformers.quantizers → quantizer_torchao →
+  torchao.nf4tensor). We never use torchao (bitsandbytes handles 4-bit).
+- FIX: `!pip uninstall -y torchao` + Runtime → Restart session → Run all.
+  Notebook 06's install cell now does the uninstall automatically for fresh VMs.
+- No units lost (failed pre-GPU). Lesson for write-up: the harness commit is
+  frozen but the Python dep stack is not fully pinned — record drift incidents.
