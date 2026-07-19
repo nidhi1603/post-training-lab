@@ -324,3 +324,19 @@ is touched; all changes live in not-yet-executed Phases 2–3.*
 4. **Counterpoint logged for the paper:** RL can genuinely exceed SFT-reachable
    coverage in some regimes (2604.01302) — the audit's 25.6% ceiling is indicative,
    not a law; frame accordingly.
+
+---
+
+## Amendment A3 (2026-07-18) — Paired-lineage initialization for RL arms
+
+**Context:** Phase-3 milestone revealed large cross-seed variance on the held-out
+exam (pass@1 21.3–29.5, sd ~4.2) despite near-identical dev results (sd 0.8),
+and dev ranking anti-predicted exam ranking (dev-best seed 42 = exam-worst).
+The prior plan (single shared RL init chosen by dev pass@16) would have picked
+the weakest exam model; switching to the exam-best seed would constitute
+selection on the held-out set.
+
+**Amendment:** DPO seed i and GRPO seed i each initialize from SFT seed i
+("paired lineage"). No init selection occurs anywhere; all three lineages run;
+arm comparisons become paired per-seed (McNemar / paired bootstrap per lineage,
+then aggregated). Decided before any RL training run.

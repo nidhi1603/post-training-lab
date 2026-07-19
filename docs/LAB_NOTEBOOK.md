@@ -417,3 +417,32 @@ Cross-seed table (61 dev bugs, k=16 @ temp 1.0):
   now `torchao torchaudio torchvision timm` (all unused by our text-only
   pipeline); notebook 06 updated. Root pattern: "import-if-installed" guards all
   over the HF stack turn any stale preinstalled package into a landmine.
+
+## S2.12 PHASE 3 COMPLETE — held-out milestone (2026-07-18, notebook 06, L4)
+
+| model | pass@1 | pass@10 |
+|---|---|---|
+| base (Phase 1) | 17.59% | 23.50% |
+| SFT s3407 | 23.63% | 32.43% |
+| SFT s42 | 21.31% | 27.02% |
+| SFT s1234 | 29.51% | 38.35% |
+| **SFT mean** | **24.82% (sd ~4.2)** | **32.60%** |
+
+- **STRATEGIC RESULT: the ceiling moved.** Base reachable set (pass@10 23.5%)
+  was below the 30.4% target; SFT mean pass@10 = 32.6% (2 of 3 seeds clear the
+  target individually; s1234 = 38.35%). SFT-expands confirmed on held-out; RL
+  now has room to convert pass@10 into pass@1 past the target. Remaining gap
+  for RL: 24.82 → 30.4 = 5.58 pts (mean), with ~7.8 pts of headroom (gap
+  pass@10−pass@1).
+- +7.23 pts pass@1 from the 672-bug synthetic curriculum. Best seed 29.51
+  (0.9 from OctoCoder-16B) — reported as distribution, never cherry-picked.
+- **Exam variance ≫ dev variance** (spread 8.2 vs 1.5 pts; sd 4.2 vs 0.8):
+  seeds equal in-distribution, very different OOD generalization. Dev ranking
+  ANTI-predicted exam ranking (s42 dev-best → exam-worst). Lesson logged.
+- **Amendment A3 adopted** (see master workflow): paired-lineage init — DPO/GRPO
+  seed i starts from SFT seed i. Supersedes S2.9's "RL-init = seed 42".
+- Smoke healthy (clean full-function rewrites; harness extraction fine).
+- Cost: ~15 min generation/seed on L4 (~4–5 units total for the milestone).
+  Artifacts: Drive phase3/ metrics_sft_s*.json + gens_sft_s*.json (full
+  per-attempt generations — reusable for audits/taxonomy breakdown).
+- Env note: exam ran on transformers 5.5-era stack post strip-list (S2.10/11).

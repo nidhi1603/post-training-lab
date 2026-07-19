@@ -102,8 +102,21 @@ targets, 1 epoch** (epoch 2 collapses dev pass@16 91.8→82.0; DeepSeek short-tr
 distillation loses 7.1 pts pass@1 at matched budget — negative result, kept).
 3-seed dev result: **pass@1 59.5% ± 0.8, pass@16 91.8% ± 1.6** (base 45.9/93.4).
 Rank ablation: r=16 costs ~2.7 pts pass@1 (outside the cross-seed ruler) — r=32
-stays. RL-init (pre-committed highest dev pass@16): seed 42. **Next:** notebook 06
-— held-out milestone eval of all 3 seeds, then Phase 4 DPO.
+stays.
+
+**Phase 3 COMPLETE — held-out milestone (2026-07-18):**
+
+| model | pass@1 | pass@10 |
+|---|---|---|
+| base | 17.59% | 23.50% |
+| **SFT ×3 seeds (mean)** | **24.82% (sd 4.2)** | **32.60%** |
+
+**The ceiling moved**: base pass@10 (23.5%) was below the 30.4% target; SFT mean
+pass@10 is 32.6% — RL now has room to win. +7.2 pts pass@1 from 672 synthetic
+bugs; best seed 29.51%. Exam cross-seed variance (sd 4.2) ≫ dev variance (0.8),
+and dev ranking anti-predicted exam ranking → **Amendment A3**: paired-lineage
+init (DPO/GRPO seed i starts from SFT seed i; no init selection anywhere).
+**Next:** Phase 4 DPO (notebook 07 — pairs mined from routing samples).
 
 ## License
 
