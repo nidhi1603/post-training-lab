@@ -446,3 +446,48 @@ Cross-seed table (61 dev bugs, k=16 @ temp 1.0):
   Artifacts: Drive phase3/ metrics_sft_s*.json + gens_sft_s*.json (full
   per-attempt generations — reusable for audits/taxonomy breakdown).
 - Env note: exam ran on transformers 5.5-era stack post strip-list (S2.10/11).
+
+## S2.13 PHASE 4 RESULTS — DPO = dev-slice TIE (2026-07-19, notebook 07, A100)
+
+| lineage | SFT p@1/p@16 | DPO p@1/p@16 | Δp@1 |
+|---|---|---|---|
+| s3407 | 58.7 / 91.8 | 61.3 / 93.4 | +2.6 |
+| s42 | 60.2 / 93.4 | 60.2 / 93.4 | 0.0 |
+| s1234 | 59.5 / 90.2 | 58.9 / 86.9 | −0.6 |
+
+- Means: SFT 59.5 ± 0.8 → DPO 60.1 ± 1.2. **Δ = +0.6 < 1.5-pt ruler → TIE.**
+  Inconsistent per-seed signs = noise signature. No pass@16 collapse. Restraint
+  same-or-better (s42 probe improved to 78.1/36.7).
+- Training itself textbook-healthy: loss 0.693 (log 2) → ~0.63, reward acc
+  0.3 → 0.75–0.87, margins growing. Length bias mild (chosen 242 vs rejected
+  277 chars). 473 pairs (376 rl + 97 sft-pile gold-vs-fail). ~1.2 min/seed
+  train on A100. Pairs cached: Drive phase4/pairs_v0.json.
+- s42 DPO row EXACTLY equals its SFT parent (rounding coincidence most likely —
+  margins moved during training; noted, not hidden).
+- **Mechanistic interpretation (write-up)**: pairs are OFF-policy (base-model
+  samples) while the policy starts from SFT — rejected samples showcase
+  mistakes the SFT policy largely no longer makes. On-policy GRPO does not have
+  this defect → clean three-arm narrative if GRPO now separates.
+- **Pre-committed budget decision**: NO separate DPO held-out milestone (dev tie
+  + exam sd 4.2 makes +0.6 undetectable; saves ~15 units). DPO takes its one
+  exam shot in the Phase-7 final.
+
+## S2.14 Notebook 08 built — GRPO tracer design (seed 3407)
+
+- Init merged SFT s3407 + fresh LoRA r32/α64; KL ref = merged SFT (β=0.04).
+  Data = RL pile only (376). 250 steps, G=8, temp 1.0, lr 5e-6 cosine, no vLLM
+  (env-drift robustness). ~1.5–2 h on A100, ~20–25 units — most expensive
+  notebook yet; tracer-first before 3 seeds.
+- **Reward-hacking hole found & closed BEFORE training**: passes()-style
+  "returncode==0" grading is exploitable by `sys.exit(0)` (model code runs
+  before the asserts in the same file). Hardened runner: per-test try/except
+  harness prints a RUN-LOCAL RANDOM SENTINEL + count after tests execute;
+  no sentinel → 0 passed. Runner cell self-tests good/bad/hack candidates
+  (hack must show passed=0). Uses canonical src/reward.py (CoRPO bounds
+  0.30 < 1.25) with output_tokens ≈ chars/4.
+- Pre-flight: variance gate ON THE INIT (40 rl-pile bugs × G=8, src/variance_gate)
+  — base-model gate was 69% but SFT solves more; STOP if <30%.
+- Hacking watch: per-call mean reward + best/worst snippets stream to Drive
+  phase5/hacking_watch_s3407.jsonl.
+- Caught in authoring: JSON-escaping broke two regexes (sentinel parser, probe
+  normalizer) → replaced with escape-proof string ops + added runner self-test.
