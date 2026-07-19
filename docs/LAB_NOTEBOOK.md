@@ -397,3 +397,18 @@ Cross-seed table (61 dev bugs, k=16 @ temp 1.0):
   Notebook 06's install cell now does the uninstall automatically for fresh VMs.
 - No units lost (failed pre-GPU). Lesson for write-up: the harness commit is
   frozen but the Python dep stack is not fully pinned — record drift incidents.
+
+## S2.11 Second drift incident, same session (notebook 06)
+
+- After harness install (`pip -e .` + `-U transformers accelerate`), the harness
+  subprocess died at import: torchaudio ABI mismatch (`undefined symbol:
+  torch_dtype_float4_e2m1fn_x2`) — compiled torch add-on no longer matches the
+  shuffled torch stack; new transformers imports it merely because it exists.
+- FIX: `pip uninstall -y torchaudio torchvision` (both are matched-build add-ons;
+  vision would be the next domino). No restart needed — crash was in the
+  subprocess. Notebook 06's harness cell now removes torchao/torchaudio/
+  torchvision automatically post-install.
+- Merge stage had SUCCEEDED before this (merged_s3407 exists on the VM).
+- Protocol note: transformers version is not pinned by the harness install (was
+  5.5.0 era in Phase 1 per unsloth banners); decode params are all explicit
+  flags, but record transformers version with each exam run going forward.
