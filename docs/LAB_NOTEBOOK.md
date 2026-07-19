@@ -412,3 +412,8 @@ Cross-seed table (61 dev bugs, k=16 @ temp 1.0):
 - Protocol note: transformers version is not pinned by the harness install (was
   5.5.0 era in Phase 1 per unsloth banners); decode params are all explicit
   flags, but record transformers version with each exam run going forward.
+- S2.11 addendum: third domino — with torchvision gone, `accelerate` CLI crashed
+  because Colab-preinstalled `timm` hard-imports torchvision. Full strip list is
+  now `torchao torchaudio torchvision timm` (all unused by our text-only
+  pipeline); notebook 06 updated. Root pattern: "import-if-installed" guards all
+  over the HF stack turn any stale preinstalled package into a landmine.
