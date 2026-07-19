@@ -491,3 +491,24 @@ Cross-seed table (61 dev bugs, k=16 @ temp 1.0):
   phase5/hacking_watch_s3407.jsonl.
 - Caught in authoring: JSON-escaping broke two regexes (sentinel parser, probe
   normalizer) → replaced with escape-proof string ops + added runner self-test.
+
+## S2.15 GRPO TRACER RESULTS — healthy, modest win, best pass@16 yet (2026-07-19)
+
+- Gate on SFT init: **52% learnable** (≥30% ✓). Runner self-test passed (hack
+  candidate scored 0). Train: 250 steps, 1h11m on A100, ~2.7 epochs over RL pile.
+- Health: reward bounded 1.08–1.26 (flat-to-slight-drift), reward_std 0.05–0.44,
+  KL ≈ 0.00005–0.0013 (whisper-quiet), completions ~35–65 tok stable, clipped ≈ 0.
+  **No hacking signature.** Hack log clean (phase5/hacking_watch_s3407.jsonl).
+- Dev verdict (s3407 lineage): SFT 58.7/91.8/33.1 → DPO 61.3/93.4/32.2 →
+  **GRPO 61.0/95.1/34.1**. GRPO = +2.3 pass@1 (just past 1.5 ruler) AND
+  pass@16 95.1% (58/61 — best of ANY model incl. base 93.4). The predicted
+  on-policy profile: squeeze pass@1 WITHOUT shrinking the reachable set —
+  contrast SFT-ep2 (collapse) and offline DPO (tie).
+- Restraint probe: 73.4/32.0 (improved vs SFT 68.0/28.1) — execution reward
+  implicitly punishes breaking code.
+- HONEST CAVEAT: policy moved very little (tiny KL; mean reward ~1.2 → many
+  low-variance groups; lr 5e-6 + β 0.04 conservative). Under-trained, the safe
+  tracer failure. DECISION: recipe FROZEN as-is for seeds 42/1234 (lineage
+  comparability > squeezing the tracer); tuning temptation resisted, logged.
+- Tracer result COUNTS as seed 3407's GRPO run (identical recipe). Notebook 09
+  = seeds 42 + 1234 only. Est. ~1.5h/seed on A100 (~20 units/seed).
