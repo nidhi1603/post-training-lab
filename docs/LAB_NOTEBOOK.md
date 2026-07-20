@@ -675,3 +675,47 @@ CONFIRMED a third time). More data made the old ruler worse.
 - Running tally of environment incidents for the write-up: torchao ABI (S2.10),
   torchaudio/torchvision ABI (S2.11), timm hard-dep (S2.11 addendum),
   unsloth_zoo release breakage (this).
+
+## S2.23 ⭐⭐ CONTROLLED STUDY COMPLETE — final exam results (2026-07-19, nb 11)
+
+| model | p@1 | p@10 | | model | p@1 | p@10 |
+|---|---|---|---|---|---|---|
+| base | 17.59 | 23.50 | | dpo s3407 | 23.45 | 32.11 |
+| sft s3407 | 23.63 | 32.43 | | dpo s42 | 21.28 | 27.57 |
+| sft s42 | 21.31 | 27.02 | | dpo s1234 | 29.97 | 39.20 |
+| sft s1234 | 29.51 | 38.35 | | grpo s3407 | 23.87 | 32.24 |
+| grpo-RAND s3407 | 23.29 | 31.49 | | grpo s42 | 22.32 | 29.29 |
+| | | | | grpo s1234 | **29.97** | 39.57 |
+
+Means: SFT 24.82 (4.23) | DPO 24.90 (4.52) | GRPO 25.39 (4.04); target −5.01.
+- SFT = the entire lift (+7.2). DPO = nothing (deltas −0.18/−0.03/+0.46).
+  GRPO = +0.24/+1.01/+0.46 — 3/3 positive AGAIN (9/9 paired across dev+exam)
+  but mean +0.57 ≪ exam noise, and the CONTROL (23.29) sits in the same
+  cluster → attribution on held-out CONFIRMS dev: process effect, not signal.
+- Best singles: dpo s1234 & grpo s1234 both 29.97 — 0.43 from OctoCoder-16B.
+- Study verdict: design worked as intended (matched budgets, paired lineages,
+  control caught a publishable-looking spurious effect). Llama rerun: LOW ROI
+  now (ties + spurious) — recommend skip/defer; v2 push is the live thread.
+- TODO next session: McNemar/paired bootstrap on saved gens (local, free).
+
+## S2.24 ⭐ 13b matrix — Story A CONFIRMED + v1-SFT DAMAGE finding
+
+| model | v0-dev p@1/p@16 | new-dev p@1/p@8 |
+|---|---|---|
+| base | 45.9/93.4 | 54.2/88.3 |
+| SFT v1 | 58.7/91.8 | **46.2/76.7 — BELOW BASE** |
+| SFT v2 ep1 | 55.1/88.5 | 72.9/83.3 |
+| SFT v2 ep2 | 56.9/83.6 | **73.5/91.7** |
+
+- **v1-SFT damaged the model on docstring-style inputs** (−8 p@1 vs base):
+  Repair-R1's SFT-forgetting replicated in-house. Retro-explains the exam
+  ceiling of the controlled study (~24.8 was format-throttled).
+- **Data lever worked**: v2 +19 over base, +27 over v1 on the exam-like slice.
+  v0-dev drop was the format trade, not a regression.
+- **Epoch decision (A2 rule on the distribution GRPO v2 will train on):
+  ep2 wins** (new-dev 91.7 vs 83.3 pass@8; also higher p@1). v2 checkpoint =
+  phase8/sft_v2_s3407_ep2.
+- Still missing from nb-13 output: restraint probes ×2, which-epoch for the
+  ~0.017 loss table, formatted example (asked again).
+- Next: notebook 14 = v2 milestone exam (ONE held-out run, sftv2 ep2, L4,
+  peft-merge) → go/no-go + budget-set for GRPO v2 (+ random twin).
