@@ -719,3 +719,10 @@ Means: SFT 24.82 (4.23) | DPO 24.90 (4.52) | GRPO 25.39 (4.04); target −5.01.
   ~0.017 loss table, formatted example (asked again).
 - Next: notebook 14 = v2 milestone exam (ONE held-out run, sftv2 ep2, L4,
   peft-merge) → go/no-go + budget-set for GRPO v2 (+ random twin).
+- S2.22 addendum (incident #5): peft's LoRA dispatcher RAISES on stale
+  preinstalled torchao 0.10.0 (< its 0.16 minimum) — opposite failure mode of
+  incident #1 (there: too new for torch; here: too old for peft). Strip list
+  now rides WITH the peft install cell in notebooks 11 and 14 (my miss: the
+  new peft-only cells had dropped it; the strip lived only in the later
+  harness cell). Fix for running session: uninstall + re-run merge cell, no
+  restart. Standing rule: ANY cell that imports the HF stack gets the strip.
