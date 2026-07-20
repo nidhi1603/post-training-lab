@@ -882,3 +882,28 @@ SFT v2 s3407 (34.51/47.24) with all three deltas + GPT-4 ~47 reference
 (pass@1 only). Same-seed paired lineage (A3), so deltas are twin-vs-twin,
 not seed lottery. Per-problem McNemar from saved gens deferred to the stats
 notebook. Outcome picks LinkedIn post #2's ending.
+
+## S2.31 — Persona probe built (nb 19) + registered predictions (2026-07-20)
+
+Nidhi wants to test the parked persona idea: does telling the model "you are
+a senior engineer" change its bug-fixing behaviour? Built
+`notebooks/19_persona_probe.ipynb` — **inference-time A/B first** (cheapest
+version): SFT v2 s3407, the standard 60 new-dev bugs, k=8, three arms:
+**standard** (control), **persona_system** (system message — replaces Qwen's
+built-in default system prompt), **persona_prefix** (persona inside the user
+message). Any GPU, ~30-45 min on A100; parallel-safe with nb 18 (reads
+`sft_v2_s3407_ep2`, writes only `dev_eval_persona_*`). Optional RUN_BASE
+toggle adds the untrained-base contrast (has SFT overwritten the base's
+persona-sensitivity?).
+
+**Registered BEFORE running:**
+1. standard must reproduce ~73.5/91.7 within noise, else probe void.
+2. All three arms within the ±3-4 band of each other — persona adds no task
+   information a 1.5B format-locked model can use.
+3. If anything, persona_prefix leans negative (bigger perturbation of the
+   trained input format — the 13b format-toxicity lesson).
+4. Ceiling registered: the exam prompt is FROZEN, so even a dev win could
+   never touch the headline number. This is a behaviour/robustness probe.
+   Training-time persona twin (persona baked into SFT data, then evaluated
+   with the STANDARD prompt — where the mismatch lesson predicts a hurt) =
+   notebook 20, built only if this probe shows an effect outside noise.
