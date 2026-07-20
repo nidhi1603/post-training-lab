@@ -801,3 +801,46 @@ Means: SFT 24.82 (4.23) | DPO 24.90 (4.52) | GRPO 25.39 (4.04); target −5.01.
   effect persists; both≈SFT = saturated. Dev (60 new-dev, k=8, ±3-4 noise) is
   preliminary; exam (nb 18: one run each) is the referee + GPT-4-47 chase.
 - Self-tests in-notebook: sys.exit hack → 0 passed; edit_cost minimal < rewrite.
+
+## S2.29 ⭐⭐ CHECKPOINT / HANDOFF (2026-07-19 late) — full state save
+
+**LIVE RIGHT NOW:** notebook 17 (GRPO v2 twins, seed 3407) is RUNNING in
+Nidhi's Colab — 'real' (exec reward + EA penalty) and 'random' twin, 500 steps
+each, ~2.5h/run on A100. First thing to collect next: gate line, reward rows,
+preliminary verdict table, probe lines, watch-file heads/tails (S2.28 design).
+
+**CONFIRMED RESULTS LEDGER (all pushed):**
+- Controlled study (S2.23): SFT 24.82 / DPO 24.90 / GRPO 25.39 exam means;
+  GRPO nudge spurious per random control (S2.19); best singles 29.97.
+- V2 push (S2.25/S2.27): SFT v2 exam = 34.51/38.72/42.65 → mean 38.63 (sd
+  4.07), p@10 48.66 — TARGET 30.4 BEATEN, pre-registered standard met.
+- Diagnoses: v1-SFT below-base on docstring inputs (S2.24); ep2-collapse
+  pattern ×3; rank-vs-epochs; trace-arm negative result; DPO off-policy tie.
+
+**BUILT-BUT-NOT-YET-RUN / TO BUILD:**
+- nb 17 running; **nb 18 (twins exam referee) NOT YET BUILT** — build after
+  17's verdict: peft-merge grpo_v2_{real,random}_s3407 (chain: merged_sftv2 →
+  adapter), 2 harness runs, table vs SFT v2 s3407 34.51 + GPT-4-47 chase.
+- Stats notebook (clustered CIs + McNemar from saved gens) — not built.
+- data_v1 files still Drive-only (phase8/) — TODO copy into repo data/.
+- Write-up — not started; structure implied by S2.23–S2.27.
+
+**PARKED IDEAS (with registered predictions):**
+- Prompt-format ablation: train-prompt mimicking the harness instruct
+  structure (v2.1 candidate). Prediction: exam-mimic > current > persona ≈
+  current. Persona prompting per se: rejected (evidence + mechanism, chat
+  2026-07-19). Exam prompt itself: FROZEN, untouchable.
+- Mixture rebalance (old-format upweight) — superseded by v2 exam win; only
+  revisit if GRPO v2 needs it.
+
+**STANDING OPEN ITEMS:** nb-13 missing outputs never received (restraint
+probes ×2, which-epoch for the 0.017 loss table, formatted example); Colab
+units balance never reported; Llama cross-family rerun recommended SKIPPED
+(low ROI, S2.23); eval/taxonomy.json per-problem map still placeholder;
+contamination_report.md still stub.
+
+**CAREER TRACK (details NOT in this public repo):** LinkedIn results-post
+draft v1 + full profile rewrite (headline/About/experience/skills/featured) +
+recruiter-keyword strategy saved locally in
+`../CAREER_linkedin_updates.md` (private). Post #1 ready now; post #2 after
+nb-17/18 verdict.
