@@ -759,3 +759,28 @@ Means: SFT 24.82 (4.23) | DPO 24.90 (4.52) | GRPO 25.39 (4.04); target −5.01.
   slightly below 34.51. Loss curves mirror tracer (0.08→0.03; ep2 ~0.02).
   ~2m20s/epoch on A100. Adapters: phase8/sft_v2_s{42,1234}_ep{1,2}.
 - Next: notebook 16 (L4) — the exam confirmation → 3-seed mean ± sd vs 30.40.
+
+## S2.27 ⭐⭐⭐ TARGET BEATEN — CONFIRMED, 3 SEEDS, CLEAN WIN (2026-07-19, nb 16)
+
+| model | p@1 | p@10 |
+|---|---|---|
+| SFT v2 s3407 | 34.51 | 47.24 |
+| SFT v2 s42 | 38.72 | 48.54 |
+| SFT v2 s1234 | 42.65 | 50.21 |
+| **MEAN** | **38.63 (sd 4.07)** | **48.66** |
+
+- Pre-registered claim standard MET: mean (+8.23) AND every seed (worst 34.51,
+  +4.11) above OctoCoder-16B's 30.40. Tracer was the WORST draw of three
+  (prediction overruled again). Every seed also clears WizardCoder-16B (~31.8).
+  Best seed 42.65 = within ~5 pts of GPT-4's reported 47.0 pass@1 (stretch).
+- Rough significance: mean−target = 8.23 with between-seed SE ≈ 2.35 → ~3.5 SE.
+  Formal clustered CIs + McNemar vs base/v1 from saved gens: pending (local).
+- Standing caveats for the write-up: 2023 OctoCoder vs 2024-base Qwen (temporal
+  asymmetry, claim is "modern 1.5B + rigorous data-centric post-training", not
+  "we out-engineered OctoPack"); pass@10 48.66 NOT comparable to GPT-4 pass@1.
+- Total v2-push cost: ~$0.34 API + ~20 GPU-units. The winning intervention was
+  DATA (self-broken docstring-style corpus); the matched RL study had shown
+  every algorithmic arm tie or nudge-spuriously at v1 data difficulty.
+- OPEN NEXT (fork): (a) close-out = stats notebook + write-up + repo data_v1
+  commit; (b) GRPO v2 + random twin on v2 checkpoints — scientific question
+  "does execution reward become causal on harder data?", chase toward 47.
