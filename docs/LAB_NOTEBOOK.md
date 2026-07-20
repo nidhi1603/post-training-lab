@@ -657,3 +657,21 @@ CONFIRMED a third time). More data made the old ruler worse.
 - Candidate fixes if rebalancing: v0 bugs ×2-3 upweight (restores old-format
   share + hard-pile emphasis), or mixed-format corpus (strip docstrings from
   half the DeepSeek bugs).
+
+## S2.22 Drift incident #4 — unsloth REMOVED from the exam notebook (2026-07-19)
+
+- Fresh L4 VM, notebook 11: `from unsloth import FastLanguageModel` crashed at
+  import — a NEW unsloth_zoo release (traceback shows new gemma4 patch modules)
+  triggers torch.compile at import time → inductor chain →
+  `ImportError: CUSTOM_KEY from torch.ao.quantization` on Colab's torch build.
+- STRUCTURAL FIX instead of another patch: notebook 11 no longer imports
+  unsloth AT ALL. Merge chain rewritten in pure peft/transformers
+  (PeftModel.from_pretrained + merge_and_unload, bf16, tokenizer copied from
+  adapter dir with base-id fallback). Same math as unsloth merged_16bit;
+  protocol comparability unaffected. The study's most important notebook now
+  depends only on its most stable packages.
+- Nidhi given a paste-in replacement cell (no restart needed — failed import
+  left no harmful state). Repo copy updated to match.
+- Running tally of environment incidents for the write-up: torchao ABI (S2.10),
+  torchaudio/torchvision ABI (S2.11), timm hard-dep (S2.11 addendum),
+  unsloth_zoo release breakage (this).
