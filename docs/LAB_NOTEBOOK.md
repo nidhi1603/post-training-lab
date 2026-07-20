@@ -574,3 +574,24 @@ once data gives more mixed groups.
    surgery, only if 1–4 stall.
 SEQUENCING: current controlled study finishes FIRST (notebooks 10+11 as built —
 the three-arm result stays clean); v2 push is a separate extension phase.
+
+## S2.18 Notebook 12 built — data v1 factory (v2 push step 1)
+
+- CPU notebook (parallel-safe with notebook 10), DeepSeek self-breaking per
+  S2.17: per gold function (374-function v0-restraint pool, MBPP+ suites,
+  pre-screened), (1) add docstring — must still pass FULL suite, else fall
+  back to original; (2) 6 buggy variants (3 subtle single-line + 3 multi-line/
+  compound), taxonomy-labeled; (3) certify compile + fail>=1-of-full-suite
+  (timeout = bug), AST-normalize dedupe vs fixed and each other.
+- SPLIT RULE: reuse each function's v0 split verbatim — re-hashing forbidden
+  (docstring changes the code hash) → zero v0/v1 split leakage. Gold pool
+  already contamination-screened in v0; nothing HumanEval-derived.
+- Output Drive phase8/: data_v1_bugs.json (= 672 v0 + new, target ~2.5-2.9k
+  total; new records tagged gen:'deepseek_v1' + tier), data_v1_restraint.json
+  (docstringed clean suite). Checkpoint-resume; est $2-4, 45-90 min.
+- Authoring note: sanity-checked the .format() brace escaping by actually
+  rendering the template (first check inspected the wrong cell and false-
+  alarmed; commit a9bf8a8 landed the notebook, this entry landed after).
+- Next: 13 = SFT v2 (frozen recipe, data v1) + routing v1 pass; 14 = GRPO v2
+  (re-gated pile, EA-penalty capped under the CoRPO gap, 500 steps). v2 push
+  stays clearly separated from the controlled three-arm result (10/11 as-is).
