@@ -907,3 +907,43 @@ persona-sensitivity?).
    Training-time persona twin (persona baked into SFT data, then evaluated
    with the STANDARD prompt — where the mismatch lesson predicts a hurt) =
    notebook 20, built only if this probe shows an effect outside noise.
+
+## S2.32 — nb 17 full output collected: gate, reward tables, probes (2026-07-20)
+
+**1. THE GATE LINE (the reframing fact): "learnable 15% (needs >=30%)" —
+the advisory gate FAILED on the v2 init.** Only ~1 in 7 v1 train bugs
+produces a mixed group (some samples pass, some fail) at temp 1.0 for the
+v2 model; the other ~85% of groups are uniform → zero advantage → no
+gradient (KL term only). Pre-declared as advisory, so the run proceeded —
+but every result below happened with RL leverage on only ~15% of the pile.
+This (a) explains why the real gain is modest (+2.7, not QiMeng's +26 on a
+weaker init), and (b) makes the twin separation *cleaner*: with the same
+thin margin, real signal improved the model while random signal damaged it.
+
+**2. Reward tables (sanity + dynamics):**
+- REAL: reward mean ≈1.22–1.27 all run (pass-saturated pile, consistent
+  with the gate), reward_std 0.02–0.21, KL climbed to ~0.03 mid-run and
+  settled ~0.026; mean completion length drifted 61→51 tokens.
+- RANDOM: reward mean ≈0.65, std ≈0.37 — exactly Uniform(0,1.3) moments
+  (twin sanity ✓). KL stayed ≤0.004 the ENTIRE run — 10× smaller than real.
+- The KL contrast is the story: the real reward actually moved the policy
+  and gained; the random reward barely moved it in KL yet still cost 5 pts
+  of pass@8 — a quiet diversity collapse, not a big drift.
+
+**3. Restraint probes (v0 clean dev, k=4):**
+- real:   still passes 57.8% | unchanged 49.2%
+- random: still passes 64.1% | unchanged 26.6%
+- **unchanged 49.2% is the highest ever recorded in this project** — the
+  edit-aware penalty's behavioral fingerprint (minimal-edit policy learned),
+  visible without even opening the watch file. Caveat logged honestly: real's
+  still-passes (57.8) is BELOW random's (64.1), and we still don't have the
+  SFT v2 init's own probe numbers (the nb-13 missing outputs), so per-twin
+  deltas vs init can't be computed. pen_applied head/tail from
+  `watch_grpo_v2_real_s3407.jsonl` still unseen (one-liner owed).
+
+**4. Env note:** transformers 5.5.0 emits a spurious `fix_mistral_regex`
+tokenizer warning on Qwen loads — false positive, harmless, ignore.
+
+Verdict unchanged from S2.30: dev leans "signal causal on harder data,"
+now with mechanism (KL + probe fingerprints). **Notebook 18 (built, L4)
+remains the referee.** Notebook 19 (persona probe) also ready, parallel-safe.
