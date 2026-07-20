@@ -80,6 +80,23 @@ Colab Pro ≈ 300 units. Plan ≈ 175. Update this table as you burn units.
 
 ## Status
 
+### 🏆 HEADLINE (2026-07-19): TARGET BEATEN — confirmed on 3 seeds
+
+| model | pass@1 | pass@10 |
+|---|---|---|
+| Qwen2.5-Coder-1.5B base | 17.59% | 23.50% |
+| **OctoCoder-16B (the paper's flagship — our locked target)** | **30.40%** | — |
+| **ours: SFT v2, 3-seed mean** | **38.63% (sd 4.07)** | **48.66%** |
+| ours: worst seed | 34.51% | 47.24% |
+| ours: best seed | 42.65% | 50.21% |
+
+A 1.5B model beats the 16B flagship by **+8.2 mean** (worst seed +4.1) under the
+paper's own frozen protocol — no HumanEval-derived training data, contamination-
+screened, pre-registered claim standard (mean AND every seed above target) met.
+The winning intervention was **data**: a $0.34 LLM-self-broken, docstring-style
+bug corpus (2,551 bugs), after the controlled study showed every RL arm tying
+or nudging spuriously (random-reward control) at v0 data difficulty.
+
 **Phases 0–1 COMPLETE (2026-07-18). Protocol FROZEN.**
 
 | Model | pass@1 | pass@10 |
