@@ -784,3 +784,20 @@ Means: SFT 24.82 (4.23) | DPO 24.90 (4.52) | GRPO 25.39 (4.04); target −5.01.
 - OPEN NEXT (fork): (a) close-out = stats notebook + write-up + repo data_v1
   commit; (b) GRPO v2 + random twin on v2 checkpoints — scientific question
   "does execution reward become causal on harder data?", chase toward 47.
+
+## S2.28 Path B chosen — notebook 17 built: GRPO v2 twins (2026-07-19)
+
+- Question: does the execution signal become CAUSAL once it has leverage?
+  Twin runs, byte-identical except reward: (a) REAL = src/reward.py + QiMeng
+  edit-aware penalty (among passing samples in groups with acc ≥ 0.8, penalty
+  = 0.10 × min-max-normalized difflib edit cost vs the buggy input; CoRPO
+  invariant preserved: 1.15 > 0.30); (b) RANDOM = Uniform(0,1.3) twin with
+  silent true-pass logging.
+- Recipe vs v1-GRPO: init = merged SFT v2 s3407 ep2 + fresh LoRA; data = ALL
+  2,076 v1 train bugs (advisory 40-bug gate on init first); 500 steps (2×);
+  lr 1e-5 (2×); G=8 temp 1.0 β_KL 0.04; max_prompt 896 (docstrings).
+  ~2.5 h/run on A100, ~60 units for both; RUNS list checkpointed.
+- Pre-registered readings: real≫random = causal; real≈random>SFT = process
+  effect persists; both≈SFT = saturated. Dev (60 new-dev, k=8, ±3-4 noise) is
+  preliminary; exam (nb 18: one run each) is the referee + GPT-4-47 chase.
+- Self-tests in-notebook: sys.exit hack → 0 passed; edit_cost minimal < rewrite.
