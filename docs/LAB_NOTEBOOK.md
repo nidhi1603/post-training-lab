@@ -726,3 +726,27 @@ Means: SFT 24.82 (4.23) | DPO 24.90 (4.52) | GRPO 25.39 (4.04); target −5.01.
   new peft-only cells had dropped it; the strip lived only in the later
   harness cell). Fix for running session: uninstall + re-run merge cell, no
   restart. Standing rule: ANY cell that imports the HF stack gets the strip.
+
+## S2.25 ⭐⭐⭐ TARGET BEATEN (single seed) — SFT v2 ep2 = 34.51% (2026-07-19, nb 14)
+
+| model | p@1 | p@10 |
+|---|---|---|
+| base | 17.59 | 23.50 |
+| SFT v1 s3407 | 23.63 | 32.43 |
+| controlled best mean | 25.39 | 33.70 |
+| **TARGET OctoCoder-16B** | **30.40** | — |
+| **SFT v2 ep2 s3407** | **34.51** | **47.24** |
+
+- **+4.11 over the 16B target, +10.9 over v1 same-seed, +16.9 over base** on the
+  frozen protocol. Data v1 (2,551 self-broken docstring-style bugs, $0.34) did
+  in one SFT epoch-pair what the entire matched-budget RL study could not.
+  Causal chain: controlled study → SFT load-bearing → literature → data lever →
+  v1 format-toxicity diagnosis (below-base on new-dev) → self-breaking fix.
+- pass@10 = 47.24 → ~12.7 pts amplification headroom for GRPO v2.
+- HONESTY GATES before claiming victory: (1) single seed; v1 exam cross-seed
+  sd was 4.2 ≈ the margin → seeds 42 + 1234 REQUIRED (notebooks 15+16 built);
+  (2) clustered 95% CI + McNemar vs base/v1 from saved gens (local, pending);
+  (3) 47.24 is pass@TEN — NOT comparable to GPT-4's ~47 pass@1 (guard external
+  phrasing). Training data provably HumanEval-free (v0 screen + v1 inherits).
+- Next after seed confirmation: GRPO v2 on v2-ep2 (+ matched random twin) to
+  squeeze the 12.7-pt gap; prompt-format ablation parked behind seeds.
