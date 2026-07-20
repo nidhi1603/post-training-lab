@@ -844,3 +844,41 @@ draft v1 + full profile rewrite (headline/About/experience/skills/featured) +
 recruiter-keyword strategy saved locally in
 `../CAREER_linkedin_updates.md` (private). Post #1 ready now; post #2 after
 nb-17/18 verdict.
+
+## S2.30 — GRPO v2 twins: preliminary dev verdict + notebook 18 built (2026-07-20)
+
+**Notebook 17 finished both runs (seed 3407, A100).** Dev table (60 new-dev, k=8):
+
+| model (s3407) | pass@1 | pass@8 |
+|---|---|---|
+| SFT v2 (init) | 73.5% | 91.7% |
+| GRPO v2 REAL reward | **76.2%** | **93.3%** |
+| GRPO v2 RANDOM reward | 73.8% | 86.7% |
+
+**First separation of the twins.** At v0 difficulty the control caught random
+(61.1) ≈ real (60.7) → spurious. Now: real−init **+2.7 / +1.6**; random−init
+**+0.3 / −5.0**; real−random **+2.4 p@1 / +6.6 p@8**. The random twin no
+longer reproduces the gain, and its pass@8 fell 5 pts *below* the init — at
+2× lr and 2× steps, a coin-flip gradient actively costs breadth instead of
+riding along. Reading vs pre-registered: **leaning "real ≫ random = signal
+causal on harder data"** — but the p@1 gap sits inside the ±3–4 dev noise
+band, it's one seed, and this is the ending we'd *prefer*, so maximum
+skepticism applies. **The exam is the referee.**
+
+Still owed from nb 17 (not yet pasted): gate line (learnable % of v1 pile on
+v2 init), reward-table rows, both restraint-probe lines, watch-file
+heads/tails — especially the real run's `pen_applied` trend. If pen_applied
+≈ 0 throughout, the EA penalty was inert and can be neither credited nor
+blamed for anything.
+
+**Notebook 18 built — `notebooks/18_twins_exam.ipynb`, the attribution
+referee.** L4 mandatory, ~1h, ~8–10 units, checkpointed per twin
+(`metrics_grpov2_{kind}_s3407.json` existence = skip). Two-stage pure-peft
+merge: stage A rebuilds `/content/merged_sftv2_s3407` (base +
+`sft_v2_s3407_ep2`) at the EXACT path the twin adapter_configs reference;
+stage B applies each twin adapter and merges to `/content/final_grpov2_{kind}`.
+Pinned harness `8fc5bae`, one 164×20 exam per twin, attribution table vs
+SFT v2 s3407 (34.51/47.24) with all three deltas + GPT-4 ~47 reference
+(pass@1 only). Same-seed paired lineage (A3), so deltas are twin-vs-twin,
+not seed lottery. Per-problem McNemar from saved gens deferred to the stats
+notebook. Outcome picks LinkedIn post #2's ending.
