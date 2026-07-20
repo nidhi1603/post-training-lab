@@ -595,3 +595,41 @@ the three-arm result stays clean); v2 push is a separate extension phase.
 - Next: 13 = SFT v2 (frozen recipe, data v1) + routing v1 pass; 14 = GRPO v2
   (re-gated pile, EA-penalty capped under the CoRPO gap, 500 steps). v2 push
   stays clearly separated from the controlled three-arm result (10/11 as-is).
+
+## S2.19 ⭐ CONTROL RESULT — GRPO's dev gain was SPURIOUS (2026-07-19, notebook 10)
+
+| model (3407 lineage) | pass@1 | pass@16 |
+|---|---|---|
+| SFT | 58.7 | 91.8 |
+| GRPO real reward | 61.0 | 95.1 |
+| **GRPO RANDOM reward** | **61.1** | **95.1** |
+
+- Coin-flip reward reproduced the real GRPO gain EXACTLY (+2.4/+3.3). Per the
+  pre-committed prediction table: **the execution signal contributed nothing
+  detectable at this budget** — the gain comes from the RL process itself
+  (temp-1.0 sampling + KL-anchored updates + clipping bias concentrating mass
+  on the model's own majority behavior). True-pass watch flat (~0.88–1.0):
+  noise didn't damage the model either.
+- **This is a Spurious-Rewards (2506.10947) replication in code repair at 1.5B**
+  — the study's most publishable single finding. It also retroactively explains
+  the under-trained symptoms (flat reward ~1.2, KL ~5e-4): the signal never had
+  leverage. Reframe for write-up: "RL-shaped training helps; reward CONTENT did
+  not matter at this scale/budget/data-difficulty."
+- ACTIONS TAKEN: (1) notebook 11 updated — grpo_random_s3407 added to the final
+  exam ('grporand' run) so attribution is settled on held-out; (2) GRPO v2 will
+  carry a MATCHED random-reward twin from day one (harder data v1 = the regime
+  where the signal gets its chance to prove causality).
+
+## S2.20 Data v1 factory RESULTS (2026-07-19, notebook 12)
+
+- **1,879 new certified bugs**, 374/374 functions covered → data v1 = 2,551
+  total (3.8× v0). Splits: train 1,532/dev 157/heldout 190 (v0 splits reused,
+  no leakage). Tiers: 987 subtle / 892 compound. Categories spread (compound
+  379 top; function_misuse 39 rare). Docstringed restraint suite: 374.
+- Cost $0.34, ~10 min. Smoke bugs realistic (operator swap, off-by-one, dup-
+  variable). Benign SyntaxWarnings from regex-bearing generated code.
+- Artifacts: Drive phase8/ data_v1_bugs.json, data_v1_restraint.json,
+  v1_factory_ckpt.json. TODO: copy data_v1 files into repo data/ when convenient.
+- **Notebook 13 built** — SFT v2 tracer (s3407): plain mixture (2,076 bugs +
+  303 restraint ≈ 13%), no routing upweight (v2.0), ctx 1280 for docstrings,
+  two-epoch verdict on the v0 61-bug ruler + 60-new-dev view + probes.
