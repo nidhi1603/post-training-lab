@@ -535,3 +535,42 @@ Cross-seed table (61 dev bugs, k=16 @ temp 1.0):
   notebook 11 = Phase-7 FINAL EXAM (DPO+GRPO × 3 seeds on held-out, L4 frozen;
   SFT exam rows already exist from notebook 06). Llama cross-family rerun:
   decision pending units balance (still unreported).
+
+## S2.17 Literature pass 4 (2026-07-19) — "how to beat 30.4"
+
+Papers read (targeted, gap-driven):
+- **Repair-R1** (2507.22853, closest prior, same 1.5B model): trains on 5,421
+  samples from HumanEval+MBPP+CodeForces+CodeContests w/ GPT-4o-generated
+  defects (≥10/sample). Their SFT caused FORGETTING on under-represented
+  benchmarks; RL did not. NOTE: they train on HumanEval-derived bugs —
+  contamination by OUR rules; their numbers are non-comparable protocol.
+- **QiMeng-PRepair** (2604.05963, 2026): EA-GRPO = edit-aware penalty applied
+  only to CORRECT samples when group accuracy ≥ α. Qwen2.5-Coder-3B jumped
+  +26.7 pts (their protocol) — small models over-edit, and penalizing
+  over-editing among correct fixes is a huge small-model lever. "Self-Breaking":
+  LLM generates its own buggy variants (10k pairs from 2,869 LeetCode tasks).
+- **RAFT/RFT line** (2504.11343 etc.): iterative generate → keep execution-
+  passers → SFT is a "surprisingly strong baseline" matching PPO/iter-DPO.
+- **DAPO small-model case study**: clip-higher/dynamic-sampling/token-loss can
+  HURT tiny models → do NOT adopt DAPO wholesale.
+
+Convergent diagnosis with our own data: (1) our OOD gap (dev 60 vs exam 25) =
+data too easy/narrow (672 MBPP-style, no docstrings, single-op AST bugs);
+(2) our restraint probe (~30% break-correct-code) = over-editing, exactly what
+EA-GRPO targets; (3) our GRPO under-trained (KL ~5e-4) = room for more steps
+once data gives more mixed groups.
+
+**V2 PUSH PLAN (post-Phase-7, ordered by expected points/unit):**
+1. **Data v1**: 3–5k bugs from HARDER, docstring-style sources (LeetCode-style
+   tasks + MBPP+ suites; contamination-screened) with **DeepSeek self-breaking**
+   (diverse multi-line semantic bugs, ≥2/function) + keep the execution-
+   certification gate. API cost ~$2–5.
+2. **SFT v2** on data v1 (1 epoch, frozen recipe) → new lineages.
+3. **GRPO v2**: re-gated pile + **edit-aware penalty** (capped to preserve the
+   CoRPO invariant) + 500 steps (2× — our KL says under-trained).
+4. **RAFT round** if still short: sample k=8 on train bugs w/ best model, keep
+   passers, SFT, once or twice. All infra exists.
+5. (Optional) Repair-R1's test-generation-first as an auxiliary task — bigger
+   surgery, only if 1–4 stall.
+SEQUENCING: current controlled study finishes FIRST (notebooks 10+11 as built —
+the three-arm result stays clean); v2 push is a separate extension phase.
