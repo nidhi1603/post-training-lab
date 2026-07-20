@@ -512,3 +512,26 @@ Cross-seed table (61 dev bugs, k=16 @ temp 1.0):
   comparability > squeezing the tracer); tuning temptation resisted, logged.
 - Tracer result COUNTS as seed 3407's GRPO run (identical recipe). Notebook 09
   = seeds 42 + 1234 only. Est. ~1.5h/seed on A100 (~20 units/seed).
+
+## S2.16 PHASE 5 COMPLETE — full 3-arm × 3-seed dev table (2026-07-19)
+
+| arm | s3407 | s42 | s1234 | mean p@1 (sd) | mean p@16 |
+|---|---|---|---|---|---|
+| SFT | 58.7/91.8 | 60.2/93.4 | 59.5/90.2 | 59.5 (0.8) | 91.8 |
+| DPO | 61.3/93.4 | 60.2/93.4 | 58.9/86.9 | 60.1 (1.2) | 91.3 |
+| GRPO | 61.0/95.1 | 60.7/95.1 | 60.3/91.8 | **60.7 (0.3)** | **94.0** |
+
+- **GRPO beats SFT with UNANIMOUS paired signs**: Δp@1 = +2.3/+0.5/+0.8,
+  Δp@16 = +3.3/+1.7/+1.6 (6/6 positive). DPO deltas mixed-sign (noise).
+- GRPO also CUT cross-seed sd to 0.3 (vs 0.8/1.2) and is the only arm whose
+  mean reachable set (94.0) exceeds base (93.4). Held seed-1234's p@16 at 91.8
+  where DPO dropped it to 86.9.
+- HONEST: mean +1.2 p@1 < 1.5 unpaired ruler — the claim rests on paired
+  consistency, not magnitude. Exam decides.
+- Seeds 42/1234 runs healthy: gates 40%/50%, rewards bounded 1.08–1.28, KL tiny,
+  lengths stable, clipped ≈ 0 (one 0.6% blip s42@175), probes 70.3/71.1
+  still-passes. No hacking. ~1h10/seed train on A100 (s1234 47 min).
+- Next: notebook 10 = random-reward control (seed 3407, dev-only verdict);
+  notebook 11 = Phase-7 FINAL EXAM (DPO+GRPO × 3 seeds on held-out, L4 frozen;
+  SFT exam rows already exist from notebook 06). Llama cross-family rerun:
+  decision pending units balance (still unreported).
