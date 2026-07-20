@@ -116,7 +116,25 @@ pass@10 is 32.6% — RL now has room to win. +7.2 pts pass@1 from 672 synthetic
 bugs; best seed 29.51%. Exam cross-seed variance (sd 4.2) ≫ dev variance (0.8),
 and dev ranking anti-predicted exam ranking → **Amendment A3**: paired-lineage
 init (DPO/GRPO seed i starts from SFT seed i; no init selection anywhere).
-**Next:** Phase 4 DPO (notebook 07 — pairs mined from routing samples).
+
+**CONTROLLED STUDY COMPLETE (2026-07-19)** — held-out final exam, frozen protocol:
+
+| arm (3 seeds) | mean pass@1 | mean pass@10 |
+|---|---|---|
+| base | 17.59% | 23.50% |
+| SFT | 24.82% (sd 4.2) | 32.60% |
+| SFT+DPO | 24.90% (sd 4.5) | 32.96% |
+| SFT+GRPO | 25.39% (sd 4.0) | 33.70% |
+| GRPO w/ **random reward** (control) | 23.29% (s3407) | 31.49% |
+
+Findings: **SFT is the entire lift** (+7.2); DPO adds nothing; GRPO adds a tiny
+9/9-paired-consistent nudge that the **random-reward control fully reproduces**
+(Spurious-Rewards replication in code repair at 1.5B — process effect, not
+signal, at this budget). Best singles: 29.97% (both RL arms, seed 1234) — 0.43
+from OctoCoder-16B. Follow-up (13b matrix): v1-SFT scores **below base** on
+docstring-style inputs (SFT-forgetting), while **data-v1 SFT ("v2 push",
+2,551 self-broken bugs) scores +27 over v1** on that exam-like slice — the
+v2 extension (notebooks 12–14+) chases 30.4 from there.
 
 ## License
 
