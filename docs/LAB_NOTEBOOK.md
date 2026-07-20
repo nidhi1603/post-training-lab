@@ -633,3 +633,27 @@ the three-arm result stays clean); v2 push is a separate extension phase.
 - **Notebook 13 built** — SFT v2 tracer (s3407): plain mixture (2,076 bugs +
   303 restraint ≈ 13%), no routing upweight (v2.0), ctx 1280 for docstrings,
   two-epoch verdict on the v0 61-bug ruler + 60-new-dev view + probes.
+
+## S2.21 SFT v2 tracer verdict — REGRESSED on the v0 ruler; judgment SUSPENDED
+
+Notebook 13 (s3407, v0-dev 61 ruler): v2 ep1 55.1/88.5 (v1: 58.7/91.8 →
+−3.6/−3.3, outside the 1.5 band); ep2 56.9/83.6 (pass@16 collapse pattern
+CONFIRMED a third time). More data made the old ruler worse.
+
+- CONFOUND flagged before concluding: the v0 ruler is docstring-FREE while v2
+  trained 74% docstring-style — the ruler is now partially OOD for v2, and the
+  EXAM is docstring-style (looks like the NEW distribution). The v0-dev table
+  cannot distinguish "v2 worse" from "v2 shifted toward exam format."
+- MISSING outputs requested from Nidhi: both sftv2 newdev eval lines, both
+  restraint probes, formatted-example head, and WHICH EPOCH the pasted loss
+  table (start ~0.017) belongs to — fine for ep2, red flag if ep1 (04's ep1
+  started ~0.23; would suggest a data-path/masking problem).
+- **Notebook 13b built**: cross-eval of base + v1-SFT on the SAME 60 new-dev
+  bugs (k=8, identical sample via seed) → completes the {base, v1, v2} ×
+  {v0-dev, new-dev} matrix. Decision rule pre-stated: v2≫v1 on new-dev while
+  v1>v2 on v0-dev = format trade → REBALANCE mixture (e.g. upweight v0-style
+  + restore sft-pile×3), not abandon; v1≥v2 on BOTH = v2 recipe genuinely
+  worse → investigate before GRPO v2.
+- Candidate fixes if rebalancing: v0 bugs ×2-3 upweight (restores old-format
+  share + hard-pile emphasis), or mixed-format corpus (strip docstrings from
+  half the DeepSeek bugs).
