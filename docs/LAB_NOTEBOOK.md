@@ -750,3 +750,12 @@ Means: SFT 24.82 (4.23) | DPO 24.90 (4.52) | GRPO 25.39 (4.04); target −5.01.
   phrasing). Training data provably HumanEval-free (v0 screen + v1 inherits).
 - Next after seed confirmation: GRPO v2 on v2-ep2 (+ matched random twin) to
   squeeze the 12.7-pt gap; prompt-format ablation parked behind seeds.
+
+## S2.26 SFT v2 seeds 42+1234 trained (2026-07-19, nb 15) — healthy
+
+- Sanity (same 60 new-dev, k=8): s42 71.5/81.7, s1234 69.8/83.3 (tracer s3407:
+  73.5/91.7). p@1 tight across 3 seeds (69.8–73.5); tracer's 91.7 p@8 looks
+  like the high draw (±4–5 native wobble on 60 bugs) → expect exam means
+  slightly below 34.51. Loss curves mirror tracer (0.08→0.03; ep2 ~0.02).
+  ~2m20s/epoch on A100. Adapters: phase8/sft_v2_s{42,1234}_ep{1,2}.
+- Next: notebook 16 (L4) — the exam confirmation → 3-seed mean ± sd vs 30.40.
