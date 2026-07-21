@@ -168,6 +168,25 @@ restraint probe) without shaping exam correctness. **Final study conclusion:
 data > algorithm at this scale and budget** — the best exam number remains
 plain SFT on better data (42.65% pass@1, seed 1234).
 
+**AGENTIC TRACK (2026-07-20 — separate protocol, never compared to pass@1):**
+the same SFT v2 model run as an *agent* — sample 10 candidate fixes in its
+native prompt format, **execute the task's own provided unit tests**, submit a
+verified fix, ≤2 self-repair rounds on the error output:
+
+| stage (seed 3407, 164 problems) | verified-resolve |
+|---|---|
+| single sample (native prompt, temp 0.8) | 44.5% |
+| best-of-10, test-verified | 65.9% |
+| + 2 repair rounds (final) | **67.7%** |
+
+**1.96× the same seed's frozen single-shot score (34.51%) with zero new
+training.** Bonus finding: the native-format single-sample row (44.5%)
+quantifies a ~10-pt prompt-format tax the frozen harness prompt charges this
+model. Registered predictions (Stage A 45–52) were beaten because the ceiling
+was anchored on the harness-prompt pass@10 — the native prompt raises the
+ceiling itself. Guardrail: this number is always "verified-resolve, agentic
+protocol" — it never enters the frozen table above.
+
 ## License
 
 Apache-2.0 (matches the Qwen2.5-Coder base model). See [`LICENSE`](LICENSE).

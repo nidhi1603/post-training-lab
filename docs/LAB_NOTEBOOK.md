@@ -1049,3 +1049,46 @@ the runner ≥160/164 and buggy solutions must fail ≥140/164, else run VOID.
 Runs on A100 or L4 (~1–1.5h), checkpointed every 20 problems to
 `agentic_s{SEED}.json`, resumable. SEED=3407 first (lineage continuity);
 SEED=1234 (best frozen seed, 42.65) as the follow-up best-seed run.
+
+## S2.36 — ⭐ AGENTIC TRACK RESULT: 67.7% verified-resolve (2026-07-20)
+
+Notebook 20 complete (SFT v2 seed 3407, 164 exam problems). Calibration gate
+passed (hard asserts — the run cannot reach the verdict otherwise).
+
+| stage | verified-resolve |
+|---|---|
+| single sample (temp 0.8, NATIVE prompt) | **44.5%** |
+| Stage A: best-of-10, test-verified | **65.9%** |
+| + repair round 1 | 67.7% |
+| + repair round 2 (FINAL) | **67.7%** |
+
+Context (different protocol, frozen single-shot): s3407 34.51/47.24;
+OctoCoder-16B 30.40; GPT-4 ~47.
+
+**Two of three registered predictions were WRONG — in the good direction —
+and both misses share one root cause (logged per house rules):** I anchored
+the ceiling on the HARNESS-prompt pass@10 (47.2). But the single-sample row
+shows the native training prompt alone is worth ~+10 pts (44.5 at temp 0.8
+vs 34.51 at temp 0.2 — and hot sampling normally HURTS single-shot, so the
+format effect is if anything larger). The native prompt raises the ceiling
+itself; best-of-10 on the raised ceiling → 65.9, blowing past the 45–52
+band. Single-sample 44.5 also exceeded its 28–40 band. **The frozen exam
+charges this model a ~10-pt prompt-format tax — now quantified.** (The
+frozen headline stands untouched; that's the point of a frozen protocol.
+This number quantifies deployable performance, separately labeled.)
+
+**Repair rounds added little (+1.8, then 0), as the tail predicts:** the
+post-Stage-A unsolved set = problems where 10 diverse samples all failed
+(genuine capability gaps), and bare AssertionErrors carry almost no
+diagnostic signal for a 1.5B. Feedback-quality upgrades (assert-diff
+printing, test-case echo) are the lever if we revisit.
+
+**Scoreboard framing: the "2x" ask is answered** — 34.51 → 67.7 = 1.96×
+(same seed, same problems, no new training), 1.75× the 3-seed frozen mean.
+Guardrails: always "verified-resolve, agentic protocol"; never pass@1;
+never a same-metric comparison against GPT-4's single-shot 47 (GPT-4 with
+the same scaffold would also score higher).
+
+Next: (1) SEED=1234 best-seed rerun (frozen 42.65 → agentic likely ~70%+);
+(2) Lever 2 — factory scale-up to raise the ceiling; (3) stats notebook
+still pending; (4) career-file update done (§7).
