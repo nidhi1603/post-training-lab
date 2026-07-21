@@ -1019,3 +1019,33 @@ Persona idea CLOSED as a clean negative result.
 Nice teaching artifact: the standard arm's own rerun variance (91.7 → 88.3)
 is the whole argument for noise rulers in one row — any "effect" smaller
 than what the same model does twice is not an effect.
+
+## S2.35 — AGENTIC TRACK opens: notebook 20 built + registered predictions (2026-07-20)
+
+New chapter after the study closed: the "increase the results" push, Lever 1.
+**`notebooks/20_agentic_track.ipynb`** — the model plays as an agent on the
+164 real exam problems: sample 10 candidate fixes (temp 0.8, NATIVE training
+prompt), **execute the task's own provided unit tests** in the sandbox,
+submit a verified fix; on failure, read the error tail and self-repair
+(≤2 rounds, k=4). Metric: **verified-resolve rate**.
+
+**Protocol wall (non-negotiable):** this is a separate, labeled track. It
+never enters the frozen table, is never called pass@1, and uses only the
+information the humanevalfixtests task provides (buggy code + tests — no
+docstrings). Prompt freedom (native format) is declared as part of the
+agentic protocol. Rationale: pass@1 can never exceed the pass@k ceiling
+(48.7), so the honest route to bigger numbers is (1) harvest the ceiling
+via verification — this notebook — and (2) raise the ceiling via data
+(factory scale-up, planned next).
+
+**Hard calibration gate before any generation:** gold solutions must pass
+the runner ≥160/164 and buggy solutions must fail ≥140/164, else run VOID.
+
+**Registered predictions:**
+1. Stage A (best-of-10, verified): **45–52%** (temp-0.2 exam pass@10 was 47.2).
+2. After 2 repair rounds: **52–62%**.
+3. Single-sample rate (temp 0.8, native prompt): uncertain, band 28–40%.
+
+Runs on A100 or L4 (~1–1.5h), checkpointed every 20 problems to
+`agentic_s{SEED}.json`, resumable. SEED=3407 first (lineage continuity);
+SEED=1234 (best frozen seed, 42.65) as the follow-up best-seed run.
