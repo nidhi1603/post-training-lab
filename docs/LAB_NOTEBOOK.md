@@ -988,3 +988,34 @@ Remaining: nb 19 persona probe (pending), stats notebook (McNemar/bootstrap
 on saved gens — twins are same-seed paired, ideal for per-problem tests),
 watch-file pen_applied one-liner, write-up, LinkedIn post #2 (ending #2
 drafted in the private career file).
+
+## S2.34 — Persona probe verdict: no effect, predictions confirmed (2026-07-20)
+
+Notebook 19 complete (SFT v2 s3407, 60 new-dev, k=8, three arms):
+
+| arm | pass@1 | pass@8 |
+|---|---|---|
+| (nb 13 reference: standard) | 73.5% | 91.7% |
+| standard (rerun) | 72.5% | 88.3% |
+| persona_system | 74.0% | 93.3% |
+| persona_prefix | 72.3% | 90.0% |
+
+**All S2.31 registered predictions confirmed:**
+1. Standard reproduced the reference within noise (−1.0/−3.4) → probe valid.
+2. All arms within the noise band: pass@1 spread 1.7 pts; pass@8 spread 5.0,
+   but the standard arm ITSELF moved 3.4 pts pass@8 between identical runs —
+   a live measurement of the ruler (binomial sd on 60 bugs ≈ 3.9 pts pass@8).
+   persona_system's +5.0 over this run's standard is ~1.3 sd — noise.
+3. persona_prefix leaned negative on pass@1 (72.3, lowest) — as registered,
+   trivially.
+
+**Verdict: telling the fine-tuned 1.5B model it is "a senior software
+engineer" changes nothing measurable.** Consistent with the format-lock
+story (13b) and with the persona literature (system-prompt personas don't
+move objective-task accuracy). **Notebook 20 (training-time persona twin)
+NOT built — the gate condition (effect outside noise) was not met.**
+Persona idea CLOSED as a clean negative result.
+
+Nice teaching artifact: the standard arm's own rerun variance (91.7 → 88.3)
+is the whole argument for noise rulers in one row — any "effect" smaller
+than what the same model does twice is not an effect.
