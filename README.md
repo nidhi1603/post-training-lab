@@ -153,6 +153,21 @@ docstring-style inputs (SFT-forgetting), while **data-v1 SFT ("v2 push",
 2,551 self-broken bugs) scores +27 over v1** on that exam-like slice — the
 v2 extension (notebooks 12–14+) chases 30.4 from there.
 
+**GRPO v2 TWINS — ATTRIBUTION REFEREE (2026-07-20):** we gave the execution
+signal everything it lacked at v0 — the harder v1 pile, 2× steps, 2× lr, and a
+QiMeng-style edit-aware penalty — and trained byte-identical twins (real reward
+vs Uniform(0,1.3)) from the SFT v2 s3407 init. Held-out exam: **real 35.95/47.07
+vs random 35.34/47.73 vs init 34.51/47.24** — real−random = +0.61 pass@1,
+effectively zero. **The Spurious-Rewards result replicates at v2 difficulty:
+every RL gain in this project was process, not signal.** Mechanism: the
+pre-flight gate found only **15%** of the pile still produced mixed pass/fail
+groups for the v2 init — SFT had consumed the headroom GRPO needs; random
+reward's damage (−5 dev pass@8) was a tail collapse the temp-0.2 exam never
+sees; the EA penalty visibly shaped behavior (record 49% unchanged-rate on the
+restraint probe) without shaping exam correctness. **Final study conclusion:
+data > algorithm at this scale and budget** — the best exam number remains
+plain SFT on better data (42.65% pass@1, seed 1234).
+
 ## License
 
 Apache-2.0 (matches the Qwen2.5-Coder base model). See [`LICENSE`](LICENSE).

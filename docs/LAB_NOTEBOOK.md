@@ -947,3 +947,44 @@ tokenizer warning on Qwen loads — false positive, harmless, ignore.
 Verdict unchanged from S2.30: dev leans "signal causal on harder data,"
 now with mechanism (KL + probe fingerprints). **Notebook 18 (built, L4)
 remains the referee.** Notebook 19 (persona probe) also ready, parallel-safe.
+
+## S2.33 — ⭐ THE ATTRIBUTION VERDICT: twins indistinguishable on the exam (2026-07-20)
+
+**Notebook 18 complete (L4, frozen protocol, 164×20 each).**
+
+| model (all seed 3407) | pass@1 | pass@10 |
+|---|---|---|
+| base | 17.59% | 23.50% |
+| OctoCoder-16B (target) | 30.40% | — |
+| SFT v2 ep2 (the init) | 34.51% | 47.24% |
+| GRPO v2 REAL reward | 35.95% | 47.07% |
+| GRPO v2 RANDOM reward | 35.34% | 47.73% |
+
+Deltas: real−init **+1.43 / −0.17**; random−init **+0.82 / +0.49**;
+**real−random +0.61 p@1 / −0.67 p@10 ≈ ZERO.**
+
+**Pre-registered reading selected: real ≈ random (≳ SFT)** — the execution
+signal is NOT causal on the exam, even at v2 difficulty with 2× steps, 2× lr,
+and the EA penalty. Both twins nudge ~+1 over the init (noise-scale, echoing
+the v1 study's +0.57 process nudge). The v1 spurious-rewards result
+REPLICATES at v2 difficulty. The dev separation (S2.30) did not transfer.
+
+**Why dev separated but the exam didn't (mechanism, honest):** dev eval
+samples k=8 at temp 1.0 — it measures the breadth of the distribution.
+The exam decodes at temp 0.2 — it measures the mode. Random reward's damage
+was a tail/diversity collapse (−5 dev pass@8, KL ≤0.004): the tail got worse,
+the mode stayed intact, so the exam never saw it. Real reward's EA penalty
+demonstrably changed behavior (49.2% unchanged-rate on the probe, the
+project record) — **the reward shaped behavior, it just didn't shape exam
+correctness.** And the 15% gate (S2.32) says why: SFT had already consumed
+the mixed-group headroom GRPO needs.
+
+**Study conclusion (final): data > algorithm at this scale and budget.
+Every RL gain measured in this project — v1 and v2 — was process, not
+signal, on the held-out exam.** Project-best exam number remains SFT v2
+seed 1234's 42.65% pass@1; no RL arm ever beat plain SFT on better data.
+
+Remaining: nb 19 persona probe (pending), stats notebook (McNemar/bootstrap
+on saved gens — twins are same-seed paired, ideal for per-problem tests),
+watch-file pen_applied one-liner, write-up, LinkedIn post #2 (ending #2
+drafted in the private career file).
