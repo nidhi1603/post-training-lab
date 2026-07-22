@@ -1170,3 +1170,35 @@ GRPO gain → random-reward control → spurious. Persona → noise ruler →
 nothing. Agentic 67.7 → base control → mostly scaffold. The third control
 was Nidhi's catch — she demanded the missing cell before believing the
 number. README + career-file guardrails updated to match.
+
+## S2.39 — The retry-budget ladder: training's value vs k (2026-07-21)
+
+Computed offline from the saved nb 20/21 checkpoints (unbiased pass@k from
+n=10, c passes; native prompt, temp 0.8, verifier = grader so pass@k =
+shippable best-of-k):
+
+| try budget k | SFT v2 | base | training lift |
+|---|---|---|---|
+| 1 | 47.6% | 26.3% | **+21.3** |
+| 3 | 59.0% | 44.7% | **+14.3** |
+| 5 | 62.6% | 53.0% | **+9.6** |
+| 10 (Stage A) | 65.9% | 62.2% | **+3.7** |
+| ~14–18 (+repair) | 67.7% | 65.2% | **+2.5** |
+
+Registered guesses (S2.39 ask): SFT@3 55–58 (actual 59.0), base@3 45–50
+(actual 44.7) — both within ~1 pt of band edges; qualitative prediction
+CONFIRMED: **fine-tuning's value decays monotonically with retry budget,
++21.3 at k=1 → +2.5 at k≈18.**
+
+**This refines S2.38's rule with the missing quantifier:** "if you can
+verify you may not need to fine-tune" is true only at LARGE k. At the
+realistic product tier k=3 (multi-suggestion UI / small retry budget),
+fine-tuning is still worth **+14.3 pts** — very real. Corrected engineering
+rule: **fine-tuning's ROI is inversely proportional to your retry budget;
+budget the fine-tune by the k your product can afford.** (Also note pass@1
+here (47.6/26.3) = mean-over-samples vs the noisier first-sample readouts
+(44.5/25.0) — consistent.)
+
+The "training value vs k" decay curve is arguably the most communicable
+artifact of the whole agentic track — candidate headline plot for the
+write-up.
