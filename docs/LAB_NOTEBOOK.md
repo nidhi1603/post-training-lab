@@ -1092,3 +1092,30 @@ the same scaffold would also score higher).
 Next: (1) SEED=1234 best-seed rerun (frozen 42.65 → agentic likely ~70%+);
 (2) Lever 2 — factory scale-up to raise the ceiling; (3) stats notebook
 still pending; (4) career-file update done (§7).
+
+## S2.37 — Agentic control built (nb 21): base through the identical scaffold (2026-07-21)
+
+Nidhi caught a real gap: the agentic 67.7 (S2.36) had no model-control. A
+scaffold flatters any model, so 67.7 is uninterpretable without base+agent.
+Built `notebooks/21_agentic_base_control.ipynb` — the untrained base
+(`unsloth/Qwen2.5-Coder-1.5B-Instruct`) through the BYTE-IDENTICAL pipeline
+(same 164 problems, same verifier, same best-of-10 + 2 repair rounds, same
+native prompt, same temps). Only the model changes. Checkpoint
+`agentic_base.json` (separate from `agentic_s3407.json`). Completes the 2x2:
+
+|          | single-shot | + agent |
+|----------|-------------|---------|
+| Base 1.5B| 17.6%       | **nb 21** |
+| SFT v2   | 34.5%       | 67.7%   |
+
+**Registered prediction:** base+agent **30-42%**, well below 67.7. Mechanism:
+best-of-n can only SELECT a correct fix the model GENERATES; the verifier
+can't invent one. Base rarely generates a correct fix (frozen pass@10 23.5),
+so best-of-n has little to grab. Training raises the ceiling the agent
+harvests → SFT+agent should ≫ base+agent. If base+agent ≈ 65 instead, the
+scaffold is doing the work and training is irrelevant on this axis — a
+story-flipping result we'd need to know.
+
+Reads out four effect sizes (scaffold lift on base vs SFT; training lift
+single-shot vs +agent), so the 67.7 becomes "measures the model" or "measures
+the wrapper," provably. Honest completion of the agentic track.
