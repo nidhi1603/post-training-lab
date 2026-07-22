@@ -1119,3 +1119,54 @@ story-flipping result we'd need to know.
 Reads out four effect sizes (scaffold lift on base vs SFT; training lift
 single-shot vs +agent), so the 67.7 becomes "measures the model" or "measures
 the wrapper," provably. Honest completion of the agentic track.
+
+## S2.38 — ⭐⭐ THE 2x2 VERDICT: the scaffold, not training, does most of the agentic work (2026-07-21)
+
+Notebook 21 complete. **Registered prediction (30–42%) WRONG — badly:**
+
+|  | single-shot | + agent |
+|---|---|---|
+| Base 1.5B | 17.6% | **65.2%** |
+| SFT v2 | 34.5% | 67.7% |
+
+Effects: scaffold on base **+47.7**; scaffold on SFT +33.2; training lift
+single-shot **+16.9**; training lift under the agent **+2.5** — and binomial
+sd on 164 problems at ~65% is ±3.7 pts, so **+2.5 is within noise**. Under
+verification, training's contribution is statistically indistinguishable
+from zero. (Paired McNemar on the saved gens can sharpen this — stats
+notebook.) Base sub-readings: single-sample native temp 0.8 = 25.0%
+(vs frozen 17.6), best-of-10 = 62.2%, +repair = 65.2%.
+
+**Why my prediction failed — same root cause as the S2.36 miss, repeated:**
+I anchored the base's ceiling on its FROZEN pass@10 (23.5), measured at
+temp 0.2 under the harness prompt. Under the native prompt at temp 0.8 the
+base's true ceiling was ~62–65%. The base was always far more capable than
+the frozen protocol revealed; I keep under-estimating prompt/temperature
+effects on ceilings. Logged as a recurring personal bias.
+
+**The reframe (major):** SFT's real effect at this scale is
+**consolidation, not capability**. It barely moved the reachable ceiling
+(62.2 → 65.9 best-of-10) but massively moved first-try reliability
+(25.0 → 44.5 native single-sample; 17.6 → 34.5 frozen). The knowledge was
+mostly already in the base; SFT made it come out on the first try. This
+echoes the pass@k literature's claim about RLVR (sharpen, don't expand) —
+here observed for SFT on code repair at 1.5B.
+
+**What survives / what changes:**
+- SURVIVES: the frozen single-shot claim (38.6 mean beats OctoCoder-16B's
+  30.4). Single-shot = no verifier at inference — there, training is worth
+  +17 to +21 pts and the scaffold can't help (nothing to select with).
+- CHANGES: the agentic 67.7 may no longer be attributed to our model.
+  Corrected claim: "with an execution verifier available, best-of-n +
+  self-repair lifts even the UNTRAINED base to 65.2; fine-tuning adds ~2.5
+  (≈noise) in that regime."
+- NEW ENGINEERING RULE (the practical gold): **if you can verify at
+  inference, you may not need to fine-tune (this scale/task); fine-tuning's
+  value concentrates where verification isn't available** — latency-bound,
+  single-answer, or no-tests settings.
+
+**Control trilogy now complete, all three overturning appearances:**
+GRPO gain → random-reward control → spurious. Persona → noise ruler →
+nothing. Agentic 67.7 → base control → mostly scaffold. The third control
+was Nidhi's catch — she demanded the missing cell before believing the
+number. README + career-file guardrails updated to match.

@@ -182,10 +182,27 @@ verified fix, ≤2 self-repair rounds on the error output:
 **1.96× the same seed's frozen single-shot score (34.51%) with zero new
 training.** Bonus finding: the native-format single-sample row (44.5%)
 quantifies a ~10-pt prompt-format tax the frozen harness prompt charges this
-model. Registered predictions (Stage A 45–52) were beaten because the ceiling
-was anchored on the harness-prompt pass@10 — the native prompt raises the
-ceiling itself. Guardrail: this number is always "verified-resolve, agentic
+model. Guardrail: this number is always "verified-resolve, agentic
 protocol" — it never enters the frozen table above.
+
+**THE CONTROL (2026-07-21) — the 2×2 that re-attributes the 67.7:** running
+the **untrained base** through the byte-identical scaffold:
+
+|  | single-shot | + agent |
+|---|---|---|
+| Base 1.5B | 17.6% | **65.2%** |
+| SFT v2 | 34.5% | 67.7% |
+
+Under verification, training adds only **+2.5 pts (within the ±3.7 binomial
+noise)** — the scaffold, not the fine-tune, does the work once tests can be
+executed at inference. Registered prediction (base+agent 30–42%) was wrong,
+same root cause as before: ceilings anchored on frozen-protocol pass@10
+wildly understate what native-prompt hot sampling can reach. **Corrected
+reading: SFT at this scale consolidates (first-try reliability +17 to +21
+pts) far more than it adds capability (ceiling +2.5 ≈ noise). Fine-tuning's
+value concentrates where a verifier is NOT available; where one is, best-of-n
+on the raw base already gets ~65%.** Third control of the project, third
+appearance overturned.
 
 ## License
 
