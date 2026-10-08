@@ -1,101 +1,128 @@
 # post-training-lab
 
-A controlled study of **SFT vs DPO vs GRPO** for small-model **code repair**, with a
-first-class **evaluation** track. We take Qwen2.5-Coder-1.5B-Instruct, teach it to fix
-buggy Python three ways, and measure every step on **HumanEvalFix** (OctoPack, arXiv
-2308.07124) using the paper's own protocol — aiming to beat a 16B flagship (OctoCoder,
-~30.4% pass@1) at **1.5B**, then prove the gains are real with a random-reward control,
-three seeds per arm, and a cross-family rerun on Llama-3.2-3B-Instruct.
+**A fine-tuned 1.5B model beat OctoCoder (15.5B) on HumanEvalFix: 38.63% pass@1, 3-seed
+mean, against a 30.40% target, under the OctoPack paper's own protocol.** A controlled
+SFT vs DPO vs GRPO study, with a random-reward control, then showed what produced the
+gain: the training data, not the RL.
 
-The full plan lives in [`RL_Project_Master_Workflow.md`](RL_Project_Master_Workflow.md).
-Keep it open while you work.
+## Results
 
-**Honest novelty statement:** we are *not* the first to run RL with execution rewards
-on code repair — Repair-R1 (arXiv 2507.22853) did GRPO on exactly this model and is our
-closest prior art and baseline. Our contribution is the **controlled three-arm
-comparison under matched budgets**, the **cross-family validation** (Spurious Rewards,
-arXiv 2506.10947, in the code domain), and the **evaluation rigor**.
+Held-out HumanEvalFix (Python, 164 problems), frozen protocol:
+
+| model | pass@1 | pass@10 |
+|---|---|---|
+| Qwen2.5-Coder-1.5B base | 17.59% | 23.50% |
+| **OctoCoder, 15.5B (the paper's flagship — our locked target)** | **30.40%** | — |
+| **ours: SFT v2, 3-seed mean** | **38.63% (sd 4.07)** | **48.66%** |
+| ours: worst seed | 34.51% | 47.24% |
+| ours: best seed | 42.65% | 50.21% |
+
+A 1.5B model beats the 15.5B flagship by **+8.2 pts mean** (worst seed +4.1) under the
+paper's own frozen protocol — no HumanEval-derived training data, contamination-
+screened, pre-registered claim standard (mean AND every seed above target) met.
+The winning intervention was **data**: a $0.34 LLM-self-broken, docstring-style
+bug corpus (2,551 bugs), after the controlled study showed every RL arm tying
+or nudging spuriously (random-reward control) at v0 data difficulty.
+
+How it was measured: pass@1 at temperature 0.2, top-p 0.95 and 20 samples per problem,
+following [OctoPack (arXiv 2308.07124)](https://arxiv.org/abs/2308.07124).
+[`EVAL_PROTOCOL.md`](EVAL_PROTOCOL.md) was frozen in commit `1adb353`, before the first
+training run, and has not been edited since. OctoCoder's 30.4% is the paper's published
+score; its size is from [StarCoder (arXiv 2305.06161)](https://arxiv.org/abs/2305.06161).
+
+## What the study found
+
+1. **Data beat the algorithm.** On the first 672-bug corpus, SFT gave +7.2 pts pass@1,
+   DPO added nothing, and GRPO's small nudge was fully reproduced by GRPO with a
+   *random* reward.
+2. **The RL signal stayed at noise with better data.** Byte-identical GRPO twins from the
+   SFT v2 model, one trained on the real execution reward and one on a random reward:
+   real minus random came to +0.61 pass@1.
+3. **With a verifier, the scaffold does the work.** Sampling fixes, running each
+   problem's provided tests and repairing on failure takes the *untrained* base to 65.2%
+   verified-resolve (a separate agentic protocol, never mixed with pass@1). Training's
+   lift shrinks from +21.3 pts at one try to +2.5 at ~14–18 tries, inside the ±3.7
+   binomial noise. Fine-tune when you can't verify; scaffold when you can.
+
+Prior art: Repair-R1 ([arXiv 2507.22853](https://arxiv.org/abs/2507.22853)) already ran
+GRPO with execution rewards on this exact model, so RL for code repair is not new here.
+What this lab adds is the controlled three-arm comparison under matched budgets and
+paired seeds, a random-reward control (a replication of
+[Spurious Rewards, arXiv 2506.10947](https://arxiv.org/abs/2506.10947) in code repair at
+1.5B), and the evaluation discipline.
+
+The full record is in [Lab history](#lab-history) below and, run by run, in
+[`docs/LAB_NOTEBOOK.md`](docs/LAB_NOTEBOOK.md).
+
+## Limits
+
+- One benchmark and one model family for the headline. A Llama-3.2-3B arm was
+  baselined (29.94% pass@1), but its training rerun was skipped as low-value after the
+  controls.
+- The target is OctoCoder's published number, not a re-run under this harness. It also
+  pits a 2023 model against a 2024 base, and newer bases start stronger.
+- The contamination screen that ran drops training functions whose names collide with
+  an exam entry point or whose normalized solution matches an exam solution: 4 of 378
+  MBPP+ functions ([`scripts/build_data_v0.py`](scripts/build_data_v0.py)). The fuller
+  n-gram and embedding audit described in
+  [`eval/contamination_report.md`](eval/contamination_report.md) was not run.
+- Exam variance across seeds is large (sd 4.07 on the headline), which is why the claim
+  required every seed, not just the mean, to clear the target.
 
 ## Repo layout
 
 ```
 post-training-lab/
-├── RL_Project_Master_Workflow.md   the frozen plan (source of truth)
-├── EVAL_PROTOCOL.md                the frozen ruler — filled & committed in Phase 1
-├── eval/                           the evals deliverable (Phase 7)
-│   ├── pass_at_k.py                unbiased pass@k + clustered CIs        [done, tested]
-│   ├── stats.py                    McNemar + paired bootstrap + Holm      [done, tested]
-│   ├── taxonomy.json               OctoPack Table 15 bug taxonomy         [done]
-│   ├── taxonomy_breakdown.py       per-category pass@k table              [done, tested]
-│   └── contamination_report.md     n-gram + embedding audit               [Phase 2]
-├── src/
-│   ├── reward.py                   GRPO reward w/ CoRPO invariant         [done, tested]
-│   └── variance_gate.py            GRPO pre-flight signal gate            [done, tested]
-├── tests/                          57 tests, all green — run before any GPU
+├── EVAL_PROTOCOL.md               the frozen ruler (commit 1adb353)
+├── RL_Project_Master_Workflow.md  the original study plan
 ├── docs/
-│   ├── EVALS_PLAYBOOK.md           interview crosswalk                    [done]
-│   └── hacking_log.md              reward-hacking war log                 [fill in Phase 5]
-├── data/                           audited datasets (git-ignored; see README)
-└── notebooks/                      Colab notebooks (training lives here)
+│   ├── LAB_NOTEBOOK.md            every run, decision and result, in order
+│   ├── EVALS_PLAYBOOK.md          maps the lab to agent-evals concepts
+│   ├── READING_UPDATES.md         dated literature passes after the plan froze
+│   └── hacking_log.md             reward-hacking checklist and log template
+├── eval/
+│   ├── pass_at_k.py               unbiased pass@k + clustered CIs
+│   ├── stats.py                   McNemar + paired bootstrap + Holm
+│   ├── taxonomy.json              OctoPack Table 15 bug taxonomy (per-problem map: placeholder)
+│   ├── taxonomy_breakdown.py      per-category pass@k table
+│   ├── contamination_report.md    the planned fuller audit (not run; see Limits)
+│   └── results/phase1_audit.md    baseline audit
+├── src/
+│   ├── reward.py                  GRPO reward with the CoRPO invariant
+│   ├── variance_gate.py           GRPO pre-flight signal gate
+│   ├── mutate.py                  mutation-based bug injection
+│   └── prompts.py                 the single training-side repair prompt
+├── scripts/build_data_v0.py       data v0 build, including the contamination screen
+├── data/                          v0 corpus (672 bugs), restraint suite (374), contamination drops (4)
+├── notebooks/                     01–21: every training and evaluation run (Colab)
+└── tests/                         77 tests, CPU-only
 ```
 
-`[done]` items are implemented and unit-tested now — the whole eval + reward layer is
-laptop-runnable and green before the first GPU hour. Training happens in Colab.
+Training ran in Colab; the eval and reward layers run and are tested on a laptop.
 
-## Quickstart (local, no GPU)
+## Run the tests (CPU, no GPU)
 
 ```bash
 python3 -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
-python3 -m pytest -q          # 57 passed
+python3 -m pytest -q          # 77 passed
 ```
 
-The reward invariant and the pass@k math are proven here, not on a GPU.
-
-## Ground rules (from the master workflow — violating any invalidates the study)
+## Protocol rules (fixed before training)
 
 1. The ruler is **frozen** before training (`EVAL_PROTOCOL.md`, never edited after).
-2. **Nothing** derived from HumanEval enters training data — enforced by the Phase-2 audit.
+2. **Nothing** derived from HumanEval enters training data — enforced by the contamination
+   screen in `scripts/build_data_v0.py`.
 3. The held-out benchmark is touched **only at milestones**; daily decisions use the dev slice.
 4. **Matched budgets** across arms.
 5. **Same decode settings** for every headline number (temp 0.2, top_p 0.95, n=20, pass@1).
 6. Correctness graded by **execution only** — no LLM judge in the correctness pipeline.
 7. **Report what happened** — failed runs and hacked rewards are content, not embarrassments.
 
-## Compute budget tracker
+## Lab history
 
-Colab Pro ≈ 300 units. Plan ≈ 175. Update this table as you burn units.
-
-| Phase | Budgeted units | Spent | Notes |
-|---|---|---|---|
-| 0 Setup / Milestone 0 | ~3 | ~3 (2026-07-15) | Unsloth GRPO notebook unchanged — 250 steps, T4, 1h40m |
-| 1 Baseline (Qwen + Llama) | ~15 | ~8–12 est. (both done; Llama gen took only ~37 min on L4) | Qwen 17.59% / Llama 29.94% pass@1 |
-| 2 Data pipeline | ~10 + API | | teacher-model API separate |
-| 3 SFT ×3 seeds | ~15 | | |
-| 4 DPO ×3 seeds | ~10 | | |
-| 5 GRPO ×3 seeds | ~60 | | the main event |
-| 6 Controls + Llama rerun | ~50 | | random-reward + cross-family |
-| 7 Final eval | ~15 | | one-shot held-out |
-| **Total** | **~178** | | overflow → Modal / Lightning free tiers |
-
-## Status
-
-### 🏆 HEADLINE (2026-07-19): TARGET BEATEN — confirmed on 3 seeds
-
-| model | pass@1 | pass@10 |
-|---|---|---|
-| Qwen2.5-Coder-1.5B base | 17.59% | 23.50% |
-| **OctoCoder-16B (the paper's flagship — our locked target)** | **30.40%** | — |
-| **ours: SFT v2, 3-seed mean** | **38.63% (sd 4.07)** | **48.66%** |
-| ours: worst seed | 34.51% | 47.24% |
-| ours: best seed | 42.65% | 50.21% |
-
-A 1.5B model beats the 16B flagship by **+8.2 mean** (worst seed +4.1) under the
-paper's own frozen protocol — no HumanEval-derived training data, contamination-
-screened, pre-registered claim standard (mean AND every seed above target) met.
-The winning intervention was **data**: a $0.34 LLM-self-broken, docstring-style
-bug corpus (2,551 bugs), after the controlled study showed every RL arm tying
-or nudging spuriously (random-reward control) at v0 data difficulty.
+The study's running log, in order. Every number above traces to an entry here or in
+the lab notebook.
 
 **Phases 0–1 COMPLETE (2026-07-18). Protocol FROZEN.**
 
@@ -104,7 +131,7 @@ or nudging spuriously (random-reward control) at v0 data difficulty.
 | Qwen2.5-Coder-1.5B-Instruct (primary) | **17.59%** | 23.50% |
 | Llama-3.2-3B-Instruct (validation arm) | **29.94%** | 47.35% |
 
-Locked target (pre-committed gate): **beat OctoCoder-16B's 30.4% with the 1.5B Qwen**;
+Locked target (pre-committed gate): **beat OctoCoder's 30.4% (15.5B) with the 1.5B Qwen**;
 stretch GPT-4 (~47%). Harness commit `8fc5bae`.
 
 **Phase 2 COMPLETE (2026-07-19):** data v0.1 = 672 certified bugs (taxonomy-balanced,
@@ -148,7 +175,7 @@ Findings: **SFT is the entire lift** (+7.2); DPO adds nothing; GRPO adds a tiny
 9/9-paired-consistent nudge that the **random-reward control fully reproduces**
 (Spurious-Rewards replication in code repair at 1.5B — process effect, not
 signal, at this budget). Best singles: 29.97% (both RL arms, seed 1234) — 0.43
-from OctoCoder-16B. Follow-up (13b matrix): v1-SFT scores **below base** on
+from OctoCoder's 30.4%. Follow-up (13b matrix): v1-SFT scores **below base** on
 docstring-style inputs (SFT-forgetting), while **data-v1 SFT ("v2 push",
 2,551 self-broken bugs) scores +27 over v1** on that exam-like slice — the
 v2 extension (notebooks 12–14+) chases 30.4 from there.
